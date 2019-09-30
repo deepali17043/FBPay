@@ -1,11 +1,29 @@
 <!-- templates/base.html -->
-...
-</header>
+
+<link rel="stylesheet" href="base-style.css">
+
 {% if user.is_authenticated %}
-    <p>Hi {{ user.username }}!</p>
-    <p><a href="{% url 'logout' %}">logout</a></p>
+<div class="row">
+    <div class="column middle">
+        <p>Hi {{ user.username }}!</p>
+    </div>
+    <div class="column left">
+        <h3><a href="timeline.html">{{ user.username }}</a></h3>
+        <p><a href="about.html">About</a></p>
+        <p><a href="FriendList.html">Friends</a></p>
+        <p><a href="Groups.html">Groups</a></p>
+        <p><a href="MessageBox.html">MessageBox</a></p>
+        <p><a href="Settings.html">Settings</a></p>
+        <p><a href="{% url 'logout' %}">logout</a></p>
+    </div>
+
+    <div class="column right">
+
+    </div>
+</div>
+
 {% else %}
-    <p>You are not logged in.</p>
+<p>You are not logged in.</p>
 <!--    <a href="{% url 'login' %}">login</a>-->
 {% endif %}
 {% block content %}

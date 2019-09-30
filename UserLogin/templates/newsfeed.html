@@ -1,0 +1,9 @@
+<header>
+    <link rel="stylesheet" href="styles-base.html">
+</header>
+{% if user.is_authenticated %}
+    <p>Hi {{ user.username }}!</p>
+{% else %}
+    <p>You are not logged in.</p>
+<!--    <a href="{% url 'login' %}">login</a>-->
+{% endif %}
