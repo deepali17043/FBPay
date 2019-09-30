@@ -8,12 +8,13 @@ from django.urls import reverse_lazy
 from .forms import CustomUserCreationForm
 
 
-class LoginPage(TemplateView):
-    template_name = 'login.html'
+class OptionsView(TemplateView):
+    template_name = 'options.html'
 
 
 class ProfileView(TemplateView):
     template_name = 'base.html'
+
 
 class SignUpView(generic.CreateView):
     form_class = CustomUserCreationForm

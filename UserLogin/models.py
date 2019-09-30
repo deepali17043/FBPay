@@ -21,8 +21,9 @@ class UserManager(BaseUserManager):
     def get_by_natural_key(self, username):
         return self.get(username=username)
 
+
 # When including different types of users, convert this class into an abstract class
-class User (AbstractBaseUser):
+class User(AbstractBaseUser):
     username = models.CharField(max_length=255, unique=True)
     # password = models.CharField(max_length=255)
     name = models.CharField(max_length=255)
