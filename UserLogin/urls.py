@@ -1,6 +1,7 @@
 from . import views
 from django.urls import path
 from django.urls import path, include
+from django.conf.urls import url
 
 urlpatterns = [
     #   path('', views.LoginPage.as_view(), name ='login'),
@@ -9,5 +10,8 @@ urlpatterns = [
     path('accounts/profile/options.html', views.OptionsView.as_view(), name='options'),
     path('accounts/profile/newsfeed.html', views.OptionsView.as_view(), name='newsfeed'),
     path('accounts/profile/notify.html', views.OptionsView.as_view(), name='notifications'),
+    url(r'^(?P<username>.+)/ewallet', views.walletview, name='ewallet'),
+    url(r'^(?P<username>.+)/logoutuser/', views.logoutuser, name='logoutuser')
+
     #   path('signup/',views.signup, name='new user')
 ]

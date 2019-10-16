@@ -1,4 +1,6 @@
-from django.shortcuts import render
+from django.http import Http404
+from django.shortcuts import render, redirect
+from django.http import HttpRequest
 
 # Create your views here.
 from django.views.generic import TemplateView
@@ -6,7 +8,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.views import generic
 from django.urls import reverse_lazy
 from .forms import CustomUserCreationForm
-
+from .models import User
 
 class OptionsView(TemplateView):
     template_name = 'options.html'
@@ -20,3 +22,26 @@ class SignUpView(generic.CreateView):
     form_class = CustomUserCreationForm
     success_url = reverse_lazy('login')
     template_name = 'signup.html'
+
+
+def logoutuser(request, username):
+    user = User.object.get(username=username)
+    user.unauthenticateuser()
+    return redirect('logout')
+
+
+def walletview(request, username):
+    #print(username)
+    user = User.object.get(username=username)
+    if user.isauthenticated() == 1:
+        print(user.username)
+        raise Http404("user not logged in")
+    return render(request,'ewallet.html',{'balance':user.balance})
+
+def add_money(request, username):
+    #print(username)
+    user = User.object.get(username=username)
+    if user.isauthenticated() == 1:
+        print(user.username)
+        raise Http404("user not logged in")
+    return render(request,'ewallet.html',{'balance':user.balance})
