@@ -7,7 +7,7 @@ from .forms import CustomUserCreationForm, CustomUserChangeForm
 class CustomUserAdmin(UserAdmin):
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
-    list_display = ['username', 'name', 'Birthday']
+    list_display = ['username', 'name', 'Birthday', 'email']
     list_filter = ()
     model = User
     filter_horizontal = ()

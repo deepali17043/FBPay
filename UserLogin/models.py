@@ -4,17 +4,21 @@ from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, username, name, password=None):
+    def create_user(self, username, name, email, password=None):
         if not username:
             raise ValueError('Username must be set!')
-        user = self.model(username=username, name=name,authenticated=1)
+        user = self.model(username=username, name=name, authenticated=1, email=self.normalize_email(email))
         user.set_password(password)
         user.save(using=self._db)
         return user
 
     def create_superuser(self, username, password=None):
-        user = self.create_user(username, username, password, authenticated=1)
+        print("email: ")
+        email = input()
+        user = self.create_user(username, username, email, password)
         user.is_admin = True
+        user.is_superuser = True
+        user.is_staff = True
         user.save(using=self._db)
         return user
 
@@ -26,9 +30,10 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser):
     username = models.CharField(max_length=255, unique=True)
     # password = models.CharField(max_length=255)
+    email = models.EmailField(max_length=254, default=username)
     name = models.CharField(max_length=255)
     Birthday = models.CharField(max_length=10)
-    # WalletMoney = models.IntegerField()
+    # WalletMoney = models.IntegerField(default=)
     balance = models.IntegerField(default=True)
     authenticated = models.IntegerField(default=True)
     is_active = models.BooleanField(default=True)
@@ -62,3 +67,4 @@ class User(AbstractBaseUser):
         print(self.username)
         print(self.authenticated)
         return self.authenticated
+
