@@ -105,7 +105,16 @@ class FriendshipManager(models.Manager):
         return bool(Friendship.objects.get(user=user1).friends.filter(user=user2).exists())
 
     def befriend(self, user1, user2):
-        Friendship.objects.get(user=user1).friends.add( Friendship.objects.get(user=user2))
+        try:
+            Friendship.objects.get(user=user1)
+        except:
+            Friendship.objects.create(user=user1)
+        try:
+            Friendship.objects.get(user=user2)
+        except:
+            Friendship.objects.create(user=user2)
+        Friendship.objects.get(user=user1).friends.add(Friendship.objects.get(user=user2))
+        Friendship.objects.get(user=user2).friends.add(Friendship.objects.get(user=user1))
         # Now that user1 accepted user2's friend request we should delete any
         # request by user1 to user2 so that we don't have ambiguous data
         FriendshipRequest.objects.filter(from_user=user1,to_user=user2).delete()

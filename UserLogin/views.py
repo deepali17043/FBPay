@@ -14,9 +14,22 @@ from .models import User, FriendshipRequest
 class OptionsView(TemplateView):
     template_name = 'options.html'
 
+def get_pending_requests(user):
+    all = FriendshipRequest.objects.all()
+    for x in all:
+        print(x.to_user," ************* ")
+    frds1 = FriendshipRequest.objects.filter(to_user=user, accepted=False)
+    return frds1
 
-class ProfileView(TemplateView):
-    template_name = 'base.html'
+
+def ProfileView(request):
+    user = User.object.get(username=request.user)
+    reqs = get_pending_requests(user)
+    print("-----------------heloo=------------")
+    requests = list()
+    for x in reqs:
+        requests.append(x.from_user.username)
+    return render(request, 'base.html', {'user': user, 'reqs': requests})
 
 
 class SignUpView(generic.CreateView):
@@ -39,6 +52,7 @@ def walletview(request, username):
         raise Http404("user not logged in")
     return render(request,'ewallet.html',{'balance':user.balance})
 
+
 def send_requests_to(user1):
     all = User.object.all()
     frds1 = FriendshipRequest.objects.filter(from_user=user1)
@@ -49,6 +63,7 @@ def send_requests_to(user1):
         all = all.exclude(username=name.from_user)
     all = all.exclude(username=user1)
     return all
+
 
 def other_profile(request, username):
     user = User.object.get(username=username)
@@ -81,3 +96,13 @@ def addfriend(request, username):
 def find_friends(request):
     frds = send_requests_to(request.user)
     return render(request, 'find_friends.html', {'friends':frds})
+
+def accept(request, username):
+    user1 = User.object.get(username =request.user)
+    user2 = User.object.get(username=username)
+    exist = FriendshipRequest.objects.filter(from_user=user2, to_user=user1, accepted=False)
+    if exist:
+        list(exist)[0].accept()
+    else:
+        raise Http404("sorry, this user did not send you a friend request")
+    return redirect('accounts/profile')
