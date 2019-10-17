@@ -39,10 +39,21 @@ def walletview(request, username):
         raise Http404("user not logged in")
     return render(request,'ewallet.html',{'balance':user.balance})
 
+def send_requests_to(user1):
+    all = User.object.all()
+    frds1 = FriendshipRequest.objects.filter(from_user=user1)
+    frds2 = FriendshipRequest.objects.filter(to_user=user1)
+    for name in frds1:
+        all = all.exclude(username=name.to_user)
+    for name in frds2:
+        all = all.exclude(username=name.from_user)
+    all = all.exclude(username=user1)
+    return all
+
 def other_profile(request, username):
     user = User.object.get(username=username)
-    all = User.object.all()
-    return render(request,'profile.html',{'user':user, 'frds':all})
+    frds = send_requests_to(request.user)
+    return render(request,'profile.html',{'user':user, 'frds':frds})
 
 def add_money(request, username):
     #print(username)
@@ -68,26 +79,5 @@ def addfriend(request, username):
     return redirect(url)
 
 def find_friends(request):
-    #
-    all1 = User.object.all()
-    # all = FriendshipRequest.objects.all()
-    # for x in all:
-    #      x.delete()
-    # # --------------------------------------
-    #print(frds)
-    # all = User.object.all()
-    # for name in all:
-    #     for nm in all:
-    #         FriendshipRequest.objects.create(from_user=name, to_user=nm)
-    # print(request.user," -----------------")
-    frds1 = FriendshipRequest.objects.filter(from_user=request.user)
-    frds2 = FriendshipRequest.objects.filter(to_user=request.user)
-    for name in frds1:
-        all1 = all1.exclude(username=name.to_user)
-    for name in frds2:
-        all1 = all1.exclude(username=name.from_user)
-    all1 = all1.exclude(username=request.user)
-    # print("-----------------------")
-    # for x in all1:
-    #     print(x)
-    return render(request, 'find_friends.html', {'friends':all1})
+    frds = send_requests_to(request.user)
+    return render(request, 'find_friends.html', {'friends':frds})
