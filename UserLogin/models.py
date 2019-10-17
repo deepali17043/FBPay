@@ -94,7 +94,6 @@ class FriendshipRequest(models.Model):
     def cancel(self):
         self.delete()
 
-
 class FriendshipManager(models.Manager):
     def friends_of(self, user, shuffle=False):
         qs = User.objects.filter(friendship__friends__user=user)

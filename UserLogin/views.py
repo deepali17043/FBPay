@@ -39,6 +39,11 @@ def walletview(request, username):
         raise Http404("user not logged in")
     return render(request,'ewallet.html',{'balance':user.balance})
 
+def other_profile(request, username):
+    user = User.object.get(username=username)
+    all = User.object.all()
+    return render(request,'profile.html',{'user':user, 'frds':all})
+
 def add_money(request, username):
     #print(username)
     user = User.object.get(username=username)
@@ -47,6 +52,42 @@ def add_money(request, username):
         raise Http404("user not logged in")
     return render(request,'ewallet.html',{'balance':user.balance})
 
-def Fflist(request):
+def friends(request):
     x = FriendshipRequest.objects.filter(from_user=request.user)
-    return HttpResponse("<h1>Friends</h1>{0}".format(x))
+    return render(request, 'friends.html', {'friends': x})
+
+
+def addfriend(request, username):
+    #print(username)
+    user2 = User.object.get(username=username)
+    user1 = request.user
+    FriendshipRequest.objects.create(from_user=request.user,to_user=user2)
+    print("request_sent")
+    url = request.build_absolute_uri('/').strip("/")+"/"+user2.username+"/timeline"
+    print(url)
+    return redirect(url)
+
+def find_friends(request):
+    #
+    all1 = User.object.all()
+    # all = FriendshipRequest.objects.all()
+    # for x in all:
+    #      x.delete()
+    # # --------------------------------------
+    #print(frds)
+    # all = User.object.all()
+    # for name in all:
+    #     for nm in all:
+    #         FriendshipRequest.objects.create(from_user=name, to_user=nm)
+    # print(request.user," -----------------")
+    frds1 = FriendshipRequest.objects.filter(from_user=request.user)
+    frds2 = FriendshipRequest.objects.filter(to_user=request.user)
+    for name in frds1:
+        all1 = all1.exclude(username=name.to_user)
+    for name in frds2:
+        all1 = all1.exclude(username=name.from_user)
+    all1 = all1.exclude(username=request.user)
+    # print("-----------------------")
+    # for x in all1:
+    #     print(x)
+    return render(request, 'find_friends.html', {'friends':all1})

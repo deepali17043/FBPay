@@ -1,0 +1,6 @@
+<p><h1>{{ user.username }}</h1></p>
+{% for name in frds %}
+    {% if name.username == user.username %}
+        <p><a href="/{{user.username}}/send_req" >send request</a></p>
+    {% endif %}
+{% endfor %}
