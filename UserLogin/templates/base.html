@@ -4,11 +4,8 @@
 
 {% if user.is_authenticated %}
     {{ user.authenticateuser }}
-    <div class="row">
-        <div class="column middle">
-            <p>Hi {{ user.username }}!</p>
-        </div>
-        <div class="column left">
+    <table style="width:100%;">
+        <td style="text-align:center;">
             <h3><a href="timeline.html">{{ user.username }}</a></h3>
             <p><a href="about.html">About</a></p>
             <p><a href="FriendList.html">Friends</a></p>
@@ -17,12 +14,15 @@
             <p><a href="Settings.html">Settings</a></p>
             <p><a href="/{{ user.username }}/ewallet/" >ewallet</a></p>
             <p><a href="/{{ user.username }}/logoutuser/">logout</a></p>
-        </div>
+        </td>
+        <td style="text-align:center;">
+            <p>Hi {{ user.username }}!</p>
+        </td>
 
-        <div class="column right">
-
-        </div>
-    </div>
+        <td style="text-align:center;">
+            <p>tentative notifications</p>
+        </td>
+    </table>
 
 {% else %}
 <p>You are not logged in.</p>
