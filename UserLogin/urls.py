@@ -11,7 +11,7 @@ urlpatterns = [
     path('accounts/profile/newsfeed.html', views.OptionsView.as_view(), name='newsfeed'),
     path('accounts/profile/notify.html', views.OptionsView.as_view(), name='notifications'),
     url(r'^(?P<username>.+)/ewallet', views.walletview, name='ewallet'),
-    url(r'^(?P<username>.+)/logoutuser/', views.logoutuser, name='logoutuser')
-
+    url(r'^(?P<username>.+)/logoutuser/', views.logoutuser, name='logoutuser'),
+    path('accounts/profile/FriendList.html', views.Fflist, name='F_list'),
     #   path('signup/',views.signup, name='new user')
 ]
