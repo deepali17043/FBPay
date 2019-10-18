@@ -1,6 +1,30 @@
-<p><h1>{{ user.username }}</h1></p>
-{% for name in frds %}
-    {% if name.username == user.username %}
-        <p><a href="/{{user.username}}/send_req" >send request</a></p>
-    {% endif %}
-{% endfor %}
+<table style="width:100%;">
+    <td style="text-align:center;">
+        <p>
+        <h1>{{ user.username }}</h1></p>
+        {% for name in frds %}
+        {% if name.username == user.username %}
+            <p><a href="/{{user.username}}/send_req">send request</a></p>
+        {% endif %}
+        {% endfor %}
+    </td>
+    <td style="text-align:center;">
+        {% if pub or is_friend %}
+            {% for elem in data %}
+            <p>
+                {{elem.post}}
+            <hr/>
+            </p>
+            {% endfor %}
+        {% endif %}
+    </td>
+
+    <td style="text-align:center;">
+        {% for name in reqs %}
+        <p>{{name}} <a href="/{{name}}/accept">accept</a> <a href="/{{name}}/decline">decline</a></p>
+        {% endfor %}
+        {% if not reqs %}
+        <p> No new friend requests </p>
+        {% endif %}
+    </td>
+</table>

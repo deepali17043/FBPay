@@ -1,3 +1,4 @@
+{{ user.authenticateuser }}
 <table style="width:100%;">
     <td style="text-align:center;">
         <h3><a href="timeline.html">{{ user.username }}</a></h3>
@@ -10,7 +11,7 @@
         <hr/>
         <p><a href="messenger.html">MessageBox</a></p>
         <hr/>
-        <p><a href="Settings.html">Settings</a></p>
+        <p><a href="settings">Settings</a></p>
         <hr/>
         <p><a href="/{{ user.username }}/ewallet/" >ewallet</a></p>
         <hr/>
@@ -18,7 +19,20 @@
         <hr/>
     </td>
     <td style="text-align:center;">
-        <p>Hi {{ user.username }}!</p>
+        <p>
+        <form action="/{{user.username}}/post" method="POST">
+            {% csrf_token %}
+            {{form.as_p}}
+            <input type="text" name="timeline_post" value="input text"><br/>
+            <input type="submit" value="post">
+        </form>
+        </p>
+        {% for elem in posts %}
+            <p>
+                {{elem.post}}
+            <hr/>
+            </p>
+        {% endfor %}
     </td>
 
     <td style="text-align:center;">

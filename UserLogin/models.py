@@ -39,8 +39,9 @@ class User(AbstractBaseUser):
     name = models.CharField(max_length=255)
     Birthday = models.CharField(max_length=10)
     # WalletMoney = models.IntegerField(default=)
-    balance = models.IntegerField(default=True)
-    authenticated = models.IntegerField(default=True)
+    balance = models.IntegerField(default=1000)
+    authenticated = models.IntegerField(default=1)
+    privacy = models.BooleanField(default=True)
     is_active = models.BooleanField(default=True)
     # this field is required to login super user from admin panel
     is_staff = models.BooleanField(default=True)
@@ -90,12 +91,20 @@ class FriendshipRequest(models.Model):
 class Friendship(models.Model):
     user1 = models.ForeignKey(User, on_delete=models.CASCADE, related_name="friendship1")
     user2 = models.ForeignKey(User, on_delete=models.CASCADE, related_name="friendship2")
-
-
 #   objects = FriendshipManager()
+
 
 class MessageBox(models.Model):
     from_m = models.ForeignKey(User, on_delete=models.CASCADE, related_name="from_m1")
     to_m = models.ForeignKey(User, on_delete=models.CASCADE, related_name="to_m2")
     message = models.CharField(max_length=2500)
     datetime = models.DateTimeField(auto_now=True)
+
+
+class Timeline(models.Model):
+    from_t = models.ForeignKey(User, on_delete=models.CASCADE, related_name="from_t1")
+    to_t = models.ForeignKey(User, on_delete=models.CASCADE, related_name="to_t2")
+    post = models.CharField(max_length=2500)
+    datetime = models.DateTimeField(auto_now=True)
+    privacy = models.BooleanField(default=False)
+
