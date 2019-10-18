@@ -9,7 +9,7 @@ from django.views import generic
 from django.urls import reverse_lazy
 from django.http import HttpResponse
 from .forms import CustomUserCreationForm
-from .models import User, FriendshipRequest, Friendship
+from .models import User, FriendshipRequest, Friendship,MessageBox
 
 class OptionsView(TemplateView):
     template_name = 'options.html'
@@ -88,6 +88,7 @@ def add_money(request, username):
         raise Http404("user not logged in")
     return render(request,'ewallet.html',{'balance':user.balance})
 
+
 def friends(request):
     x = Friendship.objects.filter(user1=request.user)
     y = Friendship.objects.filter(user2=request.user)
@@ -127,6 +128,7 @@ def find_friends(request):
     #      x.delete()
     return render(request, 'find_friends.html', {'friends':reqs})
 
+
 def accept(request, username):
     user1 = User.object.get(username =request.user)
     user2 = User.object.get(username=username)
@@ -140,6 +142,7 @@ def accept(request, username):
     # print(url)
     # return redirect(url)
     return url_correction(request)
+
 
 def decline(request, username):
     user1 = User.object.get(username =request.user)
@@ -156,3 +159,28 @@ def decline(request, username):
     url = request.build_absolute_uri('/').strip("/") + "/accounts/profile"
     print(url)
     return redirect(url)
+
+
+# def add_messages(request, username,message):
+#     user1 = User.object.get(username=request.user)
+#     user2 = User.object.get(username=username)
+#     MessageBox.objects.create(from_user=user1,to_user=user2,message=message)
+#     return
+
+
+def messenger(request):
+    x = Friendship.objects.filter(user1=request.user)
+    y = Friendship.objects.filter(user2=request.user)
+    friends = list()
+    for elm in x:
+        friends.append(elm.user2.username)
+    for elm in y:
+        friends.append(elm.user1.username)
+    return render(request, 'message.html', {'friends': friends})
+
+def messagebox(request,username):
+    user1 = User.object.get(username=request.user)
+    user2 = User.object.get(username=username)
+    mess = MessageBox.objects.filter(from_user=user1, to_user=user2) | MessageBox.objects.filter(from_user=user2, to_user=user1)
+    return render(request, 'messagebox.html', {'mess': mess})
+

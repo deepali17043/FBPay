@@ -7,6 +7,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from pytz import unicode
 
+
 class UserManager(BaseUserManager):
     def create_user(self, username, name, email, password=None):
         if not username:
@@ -54,13 +55,13 @@ class User(AbstractBaseUser):
         print(">>>>")
         print(self.authenticated)
         print(self.username)
-        #user = User.object.get(username=self.username).update(authenticated=True)
+        # user = User.object.get(username=self.username).update(authenticated=True)
         user = User.object.get(username=self.username)
         user.Birthday = "199999999"
         user.authenticated = 0
         user.save()
         user1 = User.object.get(username=self.username)
-        print(user1.Birthday,"hellllllll",user1.authenticated)
+        print(user1.Birthday, "hellllllll", user1.authenticated)
         return ''
 
     def unauthenticateuser(self):
@@ -72,13 +73,11 @@ class User(AbstractBaseUser):
         print(self.authenticated)
         return self.authenticated
 
+
 class FriendshipRequest(models.Model):
-    from_user = models.ForeignKey(User, on_delete=models.CASCADE,related_name="invitations_from")
-    to_user = models.ForeignKey(User, on_delete=models.CASCADE,related_name="invitations_to")
+    from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="invitations_from")
+    to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="invitations_to")
     accepted = models.BooleanField(default=False)
-
-
-
 
     # def unfriend(self, user1, user2):
     #
@@ -92,11 +91,11 @@ class Friendship(models.Model):
     user1 = models.ForeignKey(User, on_delete=models.CASCADE, related_name="friendship1")
     user2 = models.ForeignKey(User, on_delete=models.CASCADE, related_name="friendship2")
 
- #   objects = FriendshipManager()
 
-# class MessageBox(models.Model):
-#     from_m=models.ForeignKey(User, on_delete=models.CASCADE, related_name="from_m1")
-#     to_m=models.ForeignKey(User, on_delete=models.CASCADE, related_name="to_m2")
-#     message=models.CharField(max_length=1000)
+#   objects = FriendshipManager()
 
-
+class MessageBox(models.Model):
+    from_m = models.ForeignKey(User, on_delete=models.CASCADE, related_name="from_m1")
+    to_m = models.ForeignKey(User, on_delete=models.CASCADE, related_name="to_m2")
+    message = models.CharField(max_length=2500)
+    datetime = models.DateTimeField(auto_now=True)
