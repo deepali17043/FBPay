@@ -22,6 +22,15 @@ def get_pending_requests(user):
     return frds1
 
 
+def url_correction(request):
+    if request.user.is_authenticated:
+        url = request.build_absolute_uri('/').strip("/") + "/accounts/profile"
+    else:
+        url = request.build_absolute_uri('?')
+    print(url)
+    return redirect(url)
+
+
 def ProfileView(request):
     user = User.object.get(username=request.user)
     reqs = get_pending_requests(user)
@@ -98,11 +107,11 @@ def find_friends(request):
     return render(request, 'find_friends.html', {'friends':frds})
 
 def accept(request, username):
-    user1 = User.object.get(username =request.user)
+    user1 = User.object.get(username=request.user)
     user2 = User.object.get(username=username)
     exist = FriendshipRequest.objects.filter(from_user=user2, to_user=user1, accepted=False)
     if exist:
         list(exist)[0].accept()
     else:
         raise Http404("sorry, this user did not send you a friend request")
-    return redirect('accounts/profile')
+    return url_correction(request)

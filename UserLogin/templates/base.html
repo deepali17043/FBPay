@@ -23,6 +23,9 @@
             {% for name in reqs %}
                 <p>{{name}} <a href="/{{name}}/accept">accept</a>  <a href="/{{name}}/decline">decline</a></p>
             {% endfor %}
+            {% if not reqs %}
+                <p> No new friend requests </p>
+            {% endif %}
         </td>
     </table>
 

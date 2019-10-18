@@ -61,6 +61,7 @@ class User(AbstractBaseUser):
         user.save()
         user1 = User.object.get(username=self.username)
         print(user1.Birthday,"hellllllll",user1.authenticated)
+
         return ''
 
     def unauthenticateuser(self):

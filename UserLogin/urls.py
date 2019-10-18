@@ -5,6 +5,7 @@ from django.conf.urls import url
 
 urlpatterns = [
     #   path('', views.LoginPage.as_view(), name ='login'),
+    url(r'^login/', views.url_correction, name='login'),
     path('signup/', views.SignUpView.as_view(), name='signup'),
     path('accounts/profile/', views.ProfileView, name='profile'),
     path('accounts/profile/options.html', views.OptionsView.as_view(), name='options'),
