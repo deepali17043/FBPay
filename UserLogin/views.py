@@ -9,7 +9,7 @@ from django.views import generic
 from django.urls import reverse_lazy
 from django.http import HttpResponse
 from .forms import CustomUserCreationForm
-from .models import User, FriendshipRequest
+from .models import User, FriendshipRequest, Friendship
 
 class OptionsView(TemplateView):
     template_name = 'options.html'
@@ -22,6 +22,16 @@ def get_pending_requests(user):
     return frds1
 
 
+def url_correction(request):
+    if request.user.is_authenticated:
+        url = request.build_absolute_uri('/').strip("/") + "/accounts/profile"
+    else:
+        url = request.build_absolute_uri('?')
+    print(url)
+    return redirect(url)
+
+
+
 def ProfileView(request):
     user = User.object.get(username=request.user)
     reqs = get_pending_requests(user)
@@ -29,7 +39,7 @@ def ProfileView(request):
     requests = list()
     for x in reqs:
         requests.append(x.from_user.username)
-    return render(request, 'base.html', {'user': user, 'reqs': requests})
+    return render(request, 'newsfeed.html', {'user': user, 'reqs': requests})
 
 
 class SignUpView(generic.CreateView):
@@ -79,8 +89,14 @@ def add_money(request, username):
     return render(request,'ewallet.html',{'balance':user.balance})
 
 def friends(request):
-    x = FriendshipRequest.objects.filter(from_user=request.user)
-    return render(request, 'friends.html', {'friends': x})
+    x = Friendship.objects.filter(user1=request.user)
+    y = Friendship.objects.filter(user2=request.user)
+    friends = list()
+    for elm in x:
+        friends.append(elm.user2.username)
+    for elm in y:
+        friends.append(elm.user1.username)
+    return render(request, 'friends.html', {'friends': friends})
 
 
 def addfriend(request, username):
@@ -95,14 +111,48 @@ def addfriend(request, username):
 
 def find_friends(request):
     frds = send_requests_to(request.user)
-    return render(request, 'find_friends.html', {'friends':frds})
+    x = Friendship.objects.filter(user1=request.user)
+    y = Friendship.objects.filter(user2=request.user)
+    friends = list()
+    for elm in x:
+        friends.append(elm.user2.username)
+    for elm in y:
+        friends.append(elm.user1.username)
+    reqs = list()
+    for elm in frds:
+        if elm.username not in friends:
+            reqs.append(elm.username)
+    # all = Friendship.objects.all()
+    # for x in all:
+    #      x.delete()
+    return render(request, 'find_friends.html', {'friends':reqs})
 
 def accept(request, username):
     user1 = User.object.get(username =request.user)
     user2 = User.object.get(username=username)
     exist = FriendshipRequest.objects.filter(from_user=user2, to_user=user1, accepted=False)
     if exist:
-        list(exist)[0].accept()
+        Friendship.objects.create(user1=user1, user2=user2)
+        FriendshipRequest.objects.filter(from_user=user2, to_user=user1).delete()
     else:
         raise Http404("sorry, this user did not send you a friend request")
-    return redirect('accounts/profile')
+    # url = request.build_absolute_uri('/').strip("/") + "/accounts/profile"
+    # print(url)
+    # return redirect(url)
+    return url_correction(request)
+
+def decline(request, username):
+    user1 = User.object.get(username =request.user)
+    user2 = User.object.get(username=username)
+    exist = FriendshipRequest.objects.filter(from_user=user2, to_user=user1, accepted=False)
+    if exist:
+        print(user2.username, "JA RAHA HAIIII")
+        all = FriendshipRequest.objects.all()
+        for x in all:
+            if(x.from_user==user2 and x.to_user==user1):
+                x.delete()
+    else:
+        raise Http404("sorry, this user did not send you a friend request")
+    url = request.build_absolute_uri('/').strip("/") + "/accounts/profile"
+    print(url)
+    return redirect(url)

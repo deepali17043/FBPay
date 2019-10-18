@@ -1,9 +1,32 @@
-<header>
-    <link rel="stylesheet" href="styles-base.html">
-</header>
-{% if user.is_authenticated %}
-    <p>Hi {{ user.username }}!</p>
-{% else %}
-    <p>You are not logged in.</p>
-<!--    <a href="{% url 'login' %}">login</a>-->
-{% endif %}
+<table style="width:100%;">
+    <td style="text-align:center;">
+        <h3><a href="timeline.html">{{ user.username }}</a></h3>
+        <hr/>
+        <p><a href="about.html">About</a></p>
+        <hr/>
+        <p><a href="FriendList.html">Friends</a></p>
+        <hr/>
+        <p><a href="Groups.html">Groups</a></p>
+        <hr/>
+        <p><a href="MessageBox.html">MessageBox</a></p>
+        <hr/>
+        <p><a href="Settings.html">Settings</a></p>
+        <hr/>
+        <p><a href="/{{ user.username }}/ewallet/" >ewallet</a></p>
+        <hr/>
+        <p><a href="/{{ user.username }}/logoutuser/">logout</a></p>
+        <hr/>
+    </td>
+    <td style="text-align:center;">
+        <p>Hi {{ user.username }}!</p>
+    </td>
+
+    <td style="text-align:center;">
+        {% for name in reqs %}
+            <p>{{name}} <a href="/{{name}}/accept">accept</a>  <a href="/{{name}}/decline">decline</a></p>
+        {% endfor %}
+        {% if not reqs %}
+            <p> No new friend requests </p>
+        {% endif %}
+    </td>
+</table>

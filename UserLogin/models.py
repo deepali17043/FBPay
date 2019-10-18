@@ -77,75 +77,26 @@ class FriendshipRequest(models.Model):
     to_user = models.ForeignKey(User, on_delete=models.CASCADE,related_name="invitations_to")
     accepted = models.BooleanField(default=False)
 
-    # class Meta:
-    #     verbose_name = _(u'friendship request')
-    #     verbose_name_plural = _(u'friendship requests')
-    #     unique_together = (('to_user', 'from_user'),)
 
-    def __unicode__(self):
-        return _(u'%(from_user)s wants to be friends with %(to_user)s') % \
-                    {'from_user': unicode(self.from_user),'to_user': unicode(self.to_user)}
 
-    def accept(self):
-        Friendship.objects.befriend(self.from_user, self.to_user)
-        self.accepted = True
-        self.save()
 
-    def cancel(self):
-        self.delete()
-
-class FriendshipManager(models.Manager):
-    def friends_of(self, user, shuffle=False):
-        qs = User.objects.filter(friendship__friends__user=user)
-        if shuffle:
-            qs = qs.order_by('?')
-        return qs
-
-    def are_friends(self, user1, user2):
-        return bool(Friendship.objects.get(user=user1).friends.filter(user=user2).exists())
-
-    def befriend(self, user1, user2):
-        try:
-            Friendship.objects.get(user=user1)
-        except:
-            Friendship.objects.create(user=user1)
-        try:
-            Friendship.objects.get(user=user2)
-        except:
-            Friendship.objects.create(user=user2)
-        Friendship.objects.get(user=user1).friends.add(Friendship.objects.get(user=user2))
-        Friendship.objects.get(user=user2).friends.add(Friendship.objects.get(user=user1))
-        # Now that user1 accepted user2's friend request we should delete any
-        # request by user1 to user2 so that we don't have ambiguous data
-        FriendshipRequest.objects.filter(from_user=user1,to_user=user2).delete()
-
-    def unfriend(self, user1, user2):
-        # Break friendship link between users
-        Friendship.objects.get(user=user1).friends.remove(Friendship.objects.get(user=user2))
-        # Delete FriendshipRequest's as well
-        FriendshipRequest.objects.filter(from_user=user1,to_user=user2).delete()
-        FriendshipRequest.objects.filter(from_user=user2,to_user=user1).delete()
+    # def unfriend(self, user1, user2):
+    #
+    #     Friendship.objects.get(user=user1).friends.remove(Friendship.objects.get(user=user2))
+    #
+    #     FriendshipRequest.objects.filter(from_user=user1,to_user=user2).delete()
+    #     FriendshipRequest.objects.filter(from_user=user2,to_user=user1).delete()
 
 
 class Friendship(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE,related_name='friendship')
-    friends = models.ManyToManyField('self', symmetrical=True)
+    user1 = models.ForeignKey(User, on_delete=models.CASCADE, related_name="friendship1")
+    user2 = models.ForeignKey(User, on_delete=models.CASCADE, related_name="friendship2")
 
-    objects = FriendshipManager()
+ #   objects = FriendshipManager()
 
-    # class Meta:
-    #     verbose_name = _(u'friendship')
-    #     verbose_name_plural = _(u'friendships')
+# class MessageBox(models.Model):
+#     from_m=models.ForeignKey(User, on_delete=models.CASCADE, related_name="from_m1")
+#     to_m=models.ForeignKey(User, on_delete=models.CASCADE, related_name="to_m2")
+#     message=models.CharField(max_length=1000)
 
-    def __unicode__(self):
-        return _(u'%(user)s\'s friends') % {'user': unicode(self.user)}
 
-    def friend_count(self):
-        return self.friends.count()
-    friend_count.short_description = _(u'Friends count')
-
-    def friend_summary(self, count=7):
-        friend_list = self.friends.all().select_related(depth=1)[:count]
-        return u'[%s%s]' % (u', '.join(unicode(f.user) for f in friend_list),
-                            u', ...' if self.friend_count() > count else u'')
-    friend_summary.short_description = _(u'Summary of friends')

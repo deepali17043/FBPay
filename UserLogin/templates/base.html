@@ -4,27 +4,7 @@
 
 {% if user.is_authenticated %}
     {{ user.authenticateuser }}
-    <table style="width:100%;">
-        <td style="text-align:center;">
-            <h3><a href="timeline.html">{{ user.username }}</a></h3>
-            <p><a href="about.html">About</a></p>
-            <p><a href="FriendList.html">Friends</a></p>
-            <p><a href="Groups.html">Groups</a></p>
-            <p><a href="MessageBox.html">MessageBox</a></p>
-            <p><a href="Settings.html">Settings</a></p>
-            <p><a href="/{{ user.username }}/ewallet/" >ewallet</a></p>
-            <p><a href="/{{ user.username }}/logoutuser/">logout</a></p>
-        </td>
-        <td style="text-align:center;">
-            <p>Hi {{ user.username }}!</p>
-        </td>
-
-        <td style="text-align:center;">
-            {% for name in reqs %}
-                <p>{{name}} <a href="/{{name}}/accept">accept</a>  <a href="/{{name}}/decline">decline</a></p>
-            {% endfor %}
-        </td>
-    </table>
+    <meta http-equiv="refresh" content="0; http://127.0.0.1:8000/accounts/profile" />
 
 {% else %}
 <p>You are not logged in.</p>
