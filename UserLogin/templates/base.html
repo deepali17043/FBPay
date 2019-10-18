@@ -1,6 +1,6 @@
 <!-- templates/base.html -->
 
-<link rel="stylesheet" href="base-style.css">
+<!--<link rel="stylesheet" href="base-style.css">-->
 
 {% if user.is_authenticated %}
     {{ user.authenticateuser }}
@@ -20,7 +20,9 @@
         </td>
 
         <td style="text-align:center;">
-            <p>tentative notifications</p>
+            {% for name in reqs %}
+                <p>{{name}} <a href="/{{name}}/accept">accept</a>  <a href="/{{name}}/decline">decline</a></p>
+            {% endfor %}
         </td>
     </table>
 
