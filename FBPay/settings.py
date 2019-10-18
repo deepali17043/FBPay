@@ -122,3 +122,4 @@ AUTH_USER_MODEL = 'UserLogin.User'
 STATIC_URL = '/static/'
 #LOGIN_REDIRECT_URL = '/base.html'
 LOGOUT_REDIRECT_URL = '/login/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')

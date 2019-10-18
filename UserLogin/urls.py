@@ -17,8 +17,9 @@ urlpatterns = [
     url(r'^(?P<username>.+)/timeline', views.other_profile, name='other_user'),
     url(r'^(?P<username>.+)/send_req', views.addfriend, name='request'),
     url(r'^(?P<username>.+)/logoutuser/', views.logoutuser, name='logoutuser'),
+    url(r'^(?P<username>.+)/text/', views.add_message, name='text'),
     path('accounts/profile/FriendList.html', views.friends, name='F_list'),
     path('accounts/profile/find', views.find_friends, name='find_frd'),
-    path('accounts/profile/messenger', views.messenger, name='messenger'),
+    path('accounts/profile/messenger.html', views.messenger, name='messenger'),
     #   path('signup/',views.signup, name='new user')
 ]

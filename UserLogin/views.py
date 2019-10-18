@@ -161,11 +161,14 @@ def decline(request, username):
     return redirect(url)
 
 
-# def add_messages(request, username,message):
-#     user1 = User.object.get(username=request.user)
-#     user2 = User.object.get(username=username)
-#     MessageBox.objects.create(from_user=user1,to_user=user2,message=message)
-#     return
+def add_message(request, username):
+     # print('shree')
+     user1 = User.object.get(username=request.user)
+     user2 = User.object.get(username=username)
+     # print(request.method)
+     MessageBox.objects.create(from_m=user1,to_m=user2,message=request.POST.get("message", ""))
+     # print(request.POST.get("message", ""), ".................")
+     return messagebox(request, username)
 
 
 def messenger(request):
@@ -181,6 +184,17 @@ def messenger(request):
 def messagebox(request,username):
     user1 = User.object.get(username=request.user)
     user2 = User.object.get(username=username)
-    mess = MessageBox.objects.filter(from_user=user1, to_user=user2) | MessageBox.objects.filter(from_user=user2, to_user=user1)
-    return render(request, 'messagebox.html', {'mess': mess})
+    mess = MessageBox.objects.filter(from_m=user1, to_m=user2) | MessageBox.objects.filter(from_m=user2, to_m=user1)
+    mess = mess.order_by('datetime')
+    for element in mess:
+        print(element.from_m,":")
+        print(element.message)
+    return render(request, 'messagebox.html', {'mess': mess,'username':username})
 
+
+# def add_timeline(request, username):
+#
+#     user1 = User.object.get(username=request.user)
+#     user2 = User.object.get(username=username)
+#     MessageBox.objects.create(from_m=user1, to_m=user2, message=request.POST.get("message", ""))
+#     return messagebox(request, username)
