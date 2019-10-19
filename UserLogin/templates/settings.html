@@ -1,9 +1,9 @@
-<!--<h1>Settings</h1>-->
-<!--<form action="/set_privacy/" method="POST">-->
-<!--    {% csrf_token %}-->
-<!--    {{form.as_p}}-->
-<!--    <input type="text" name="message" value="input text"><br/>-->
-<!--    <input type="submit" value="send message">-->
-<!--</form>-->
-
-<!--<hr/>-->
+<h1>Settings</h1>
+<form action="/set_privacy/" method="POST">
+    {% csrf_token %}
+    {{form.as_p}}
+    <input type="radio" name="priv" value="friends">friends can post<br/>
+    <input type="radio" name="priv" value="not">friends can't post<br/>
+    <input type="submit" value="save">
+</form>
+<hr/>

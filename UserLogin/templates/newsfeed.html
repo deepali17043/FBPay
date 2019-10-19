@@ -7,7 +7,7 @@
         <hr/>
         <p><a href="FriendList.html">Friends</a></p>
         <hr/>
-        <p><a href="Groups.html">Groups</a></p>
+        <p><a href="groups">Groups</a></p>
         <hr/>
         <p><a href="messenger.html">MessageBox</a></p>
         <hr/>
@@ -36,11 +36,25 @@
     </td>
 
     <td style="text-align:center;">
-        {% for name in reqs %}
-            <p>{{name}} <a href="/{{name}}/accept">accept</a>  <a href="/{{name}}/decline">decline</a></p>
+        <h5>Friend Requests</h5>
+        {% for name in freqs %}
+            <p>{{name.from_user.username}} <a href="/{{name.from_user.username}}/accept">accept</a>  <a href="/{{name.from_user.username}}/decline">decline</a></p>
         {% endfor %}
-        {% if not reqs %}
+        {% if not freqs %}
             <p> No new friend requests </p>
+        {% endif %}
+        <hr/>
+        <h5>Group Requests</h5>
+        {% for element in greqs %}
+        {% for elm in element %}
+            <pre><p>{{elm.group.group_name}}<br/>{{elm.fro.username}}   <a href="/{{elm.group.group_name}}/{{elm.fro.username}}/gropacc">accept</a> <a href="/{{elm.group.group_name}}/{{elm.fro.username}}/gropdec">decline</a></p>
+            <br/></pre>
+                {% endfor %}
+            <hr/>
+        {% endfor %}
+        {% if not greqs %}
+            <p> No new group requests </p>
+            <hr/>
         {% endif %}
     </td>
 </table>

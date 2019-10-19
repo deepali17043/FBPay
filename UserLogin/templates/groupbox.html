@@ -1,0 +1,14 @@
+<h1>Group Messages</h1>
+{% for element in mess %}
+    <p>{{element.user.username}}:<br/>
+        {{element.message}}<br/>
+    </p>
+{% endfor %}
+<hr/>
+<form action="/{{groupname}}/grop_text" method="POST">
+    {% csrf_token %}
+    {{form.as_p}}
+    <input type="text" name="message" value="input text"><br/>
+    <input type="submit" value="send message">
+</form>
+<br/>

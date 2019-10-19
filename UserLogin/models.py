@@ -42,6 +42,7 @@ class User(AbstractBaseUser):
     balance = models.IntegerField(default=1000)
     authenticated = models.IntegerField(default=1)
     privacy = models.BooleanField(default=True)
+    type = models.IntegerField(default=1)
     is_active = models.BooleanField(default=True)
     # this field is required to login super user from admin panel
     is_staff = models.BooleanField(default=True)
@@ -76,8 +77,8 @@ class User(AbstractBaseUser):
 
 
 class FriendshipRequest(models.Model):
-    from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="invitations_from")
-    to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="invitations_to")
+    from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="inv_from")
+    to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="inv_to")
     accepted = models.BooleanField(default=False)
 
     # def unfriend(self, user1, user2):
@@ -91,6 +92,8 @@ class FriendshipRequest(models.Model):
 class Friendship(models.Model):
     user1 = models.ForeignKey(User, on_delete=models.CASCADE, related_name="friendship1")
     user2 = models.ForeignKey(User, on_delete=models.CASCADE, related_name="friendship2")
+
+
 #   objects = FriendshipManager()
 
 
@@ -107,4 +110,31 @@ class Timeline(models.Model):
     post = models.CharField(max_length=2500)
     datetime = models.DateTimeField(auto_now=True)
     privacy = models.BooleanField(default=False)
+
+
+class Groups(models.Model):
+    group_name = models.CharField(max_length=200)
+    group_closed = models.BooleanField(default=False)
+    group_admin = models.ForeignKey(User, on_delete=models.CASCADE, related_name="grp_admin1")
+
+
+class Group_mem(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="grp_mem")
+    group = models.ForeignKey(Groups, on_delete=models.CASCADE, related_name="grp_name")
+
+
+class Group_messages(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="grp_mem1")
+    group = models.ForeignKey(Groups, on_delete=models.CASCADE, related_name="grp_name1")
+    message = models.CharField(max_length=2500)
+    datetime = models.DateTimeField(auto_now=True)
+
+
+class GroupRequest(models.Model):
+    fro = models.ForeignKey(User, on_delete=models.CASCADE, related_name="from_r")
+    group = models.ForeignKey(Groups, on_delete=models.CASCADE, related_name="to_r")
+    acc = models.BooleanField(default=False)
+
+
+
 

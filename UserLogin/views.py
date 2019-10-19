@@ -2,6 +2,7 @@ from django.http import Http404
 from django.shortcuts import render, redirect
 from django.http import HttpRequest
 
+
 # Create your views here.
 from django.views.generic import TemplateView
 from django.contrib.auth.forms import UserCreationForm
@@ -10,7 +11,7 @@ from django.urls import reverse_lazy
 from django.http import HttpResponse
 from .forms import CustomUserCreationForm
 from .models import User, FriendshipRequest, Friendship, MessageBox, Timeline
-
+from .models import Groups,Group_mem,Group_messages,GroupRequest
 
 class OptionsView(TemplateView):
     template_name = 'options.html'
@@ -18,8 +19,6 @@ class OptionsView(TemplateView):
 
 def get_pending_requests(user):
     all = FriendshipRequest.objects.all()
-    for x in all:
-        print(x.to_user, " ************* ")
     frds1 = FriendshipRequest.objects.filter(to_user=user, accepted=False)
     return frds1
 
@@ -33,14 +32,20 @@ def url_correction(request):
     return redirect(url)
 
 
+def grp_requests(user):
+    all = Groups.objects.filter(group_admin=user)
+    reqs = list()
+    for elm in all:
+        reqs.append(GroupRequest.objects.filter(group=elm))
+    return reqs
+
+
 def ProfileView(request):
     user = User.object.get(username=request.user)
     reqs = get_pending_requests(user)
-    requests = list()
-    for x in reqs:
-        requests.append(x.from_user.username)
     posts = Timeline.objects.filter(from_t=request.user, to_t=request.user)
-    return render(request, 'newsfeed.html', {'user': user, 'reqs': requests, 'posts': posts})
+    greqs = grp_requests(user)
+    return render(request, 'newsfeed.html', {'user': user, 'freqs': reqs, 'posts': posts,'greqs':greqs})
 
 
 class SignUpView(generic.CreateView):
@@ -62,6 +67,16 @@ def walletview(request, username):
         print(user.username)
         raise Http404("user not logged in")
     return render(request, 'ewallet.html', {'balance': user.balance})
+
+
+def groups(request):
+    user = User.object.get(username=request.user)
+    if user.isauthenticated() == 1:
+        raise Http404("user not logged in")
+    grp = Group_mem.objects.filter(user=user)
+    for el in grp:
+        print(el.group.group_name)
+    return render(request, 'groups.html', {'grp':grp})
 
 
 def send_requests_to(user1):
@@ -227,3 +242,106 @@ def settings(request):
     if not request.user.is_authenticated:
         raise Http404("user not logged in")
     return render(request, 'settings.html',{'user':request.user})
+
+def set_priv(request):
+    user = User.object.get(username=request.user)
+    priv = request.POST.get("priv","")
+    if priv=="friends" :
+        user.privacy = True
+    else:
+        user.privacy = False
+    url = request.build_absolute_uri('/').strip("/") + "/accounts/profile"
+    user.save()
+    return redirect(url)
+
+def grp_to_join(user1):
+    #Groups.objects.create(group_name="No lifers",group_admin=user1)
+    all = Groups.objects.all()
+    grps1 = GroupRequest.objects.filter(fro=user1,acc=False).values('group')
+    grps2 = Group_mem.objects.filter(user=user1).values('group')
+    grps = list()
+    for elm in grps1:
+        grps.append(elm)
+    for elm in grps2:
+        grps.append(elm)
+    send = list()
+    for elm in all:
+        if elm.group_name not in grps:
+            send.append(elm)
+    return send
+
+
+def join_grp(request):
+    grps = grp_to_join(request.user)
+    return render(request, 'join_groups.html', {'grps': grps})
+
+
+def user_to_grp(request,groupname):
+    grp = Groups.objects.get(group_name=groupname)
+    user = User.object.get(username=request.user)
+    if not grp.group_closed:
+        Group_mem.objects.create(user=user,group=grp)
+    else:
+        GroupRequest.objects.create(group=grp, fro=user)
+        print("group_request_sent")
+    url = request.build_absolute_uri('/').strip("/") + "/accounts/profile"
+    print(url)
+    return redirect(url)
+
+def group_box(request,groupname):
+    print("innn here-----")
+    user = User.object.get(username=request.user)
+    group = Groups.objects.get(group_name=groupname)
+    mess = Group_messages.objects.filter(group=group)
+    mess = mess.order_by('datetime')
+    for element in mess:
+        print(element.user.username, ":")
+        print(element.message)
+    return render(request, 'groupbox.html', {'mess': mess, 'groupname': group.group_name})
+
+
+def create_grp(request):
+    user = User.object.get(username=request.user)
+    c = request.POST.get("closed", "")
+    grp = False
+    if c == "yes":
+        grp = True
+    Groups.objects.create(group_name=request.POST.get("grp_name", ""),group_admin=user, group_closed=grp)
+    Group_mem.objects.create(user=user,group=Groups.objects.get(group_name=request.POST.get("grp_name", "")))
+    url = request.build_absolute_uri('/').strip("/") + "/accounts/profile/groups"
+    return redirect(url)
+
+
+def grp_send(request,groupname):
+    user = User.object.get(username=request.user)
+    grp = Groups.objects.get(group_name=groupname)
+    Group_messages.objects.create(user=user, group=grp, message=request.POST.get("message", ""))
+    return group_box(request, groupname)
+
+
+def grp_accept(request,groupname,username):
+    group = Groups.objects.get(group_name=groupname)
+    user = User.object.get(username=username)
+    print(username,"kjdsku I sent this")
+    exist = GroupRequest.objects.filter(group=group,fro=user, acc=False)
+    if exist:
+        Group_mem.objects.create(user=user,group=group)
+        GroupRequest.objects.filter(group=group,fro=user).delete()
+    else:
+        raise Http404("sorry, this user did not send you a group request")
+    url = request.build_absolute_uri('/').strip("/") + "/accounts/profile"
+    print(url)
+    return redirect(url)
+
+def grp_decline(request,groupname,username):
+    group = Groups.objects.get(group_name=groupname)
+    user = User.object.get(username=username)
+    exist = GroupRequest.objects.filter(group=group,fro=user, acc=False)
+    if exist:
+        #Group_mem.objects.create(user=user,group=group)
+        GroupRequest.objects.filter(group=group,fro=user).delete()
+    else:
+        raise Http404("sorry, this user did not send you a group request")
+    url = request.build_absolute_uri('/').strip("/") + "/accounts/profile"
+    print(url)
+    return redirect(url)

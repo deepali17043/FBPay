@@ -1,0 +1,17 @@
+<h1>Groups</h1>
+{% for element in grp %}
+    <a href="/{{element.group.group_name}}/grp">{{element.group.group_name}} </a><br/>
+{% endfor %}
+<hr/>
+<br/>
+<a href="/grp_find">Join groups</a>
+<hr/>
+<form action="/grp_create" method="POST">
+    {% csrf_token %}
+    {{form.as_p}}
+    <input type="text" name="grp_name" value="group_name"><br/>
+    <input type="radio" name="closed" value="yes">closed group<br/>
+    <input type="radio" name="closed" value="no">open group<br/>
+    <input type="submit" value="create_group">
+</form>
+<br/>
