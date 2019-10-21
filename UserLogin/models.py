@@ -42,6 +42,7 @@ class User(AbstractBaseUser):
     balance = models.IntegerField(default=1000)
     authenticated = models.IntegerField(default=1)
     privacy = models.BooleanField(default=True)
+    timeline = models.BooleanField(default=True)
     type = models.IntegerField(default=1)
     is_active = models.BooleanField(default=True)
     # this field is required to login super user from admin panel
@@ -110,6 +111,7 @@ class Timeline(models.Model):
     post = models.CharField(max_length=2500)
     datetime = models.DateTimeField(auto_now=True)
     privacy = models.BooleanField(default=False)
+    selfp = models.BooleanField(default=True)
 
 
 class Groups(models.Model):

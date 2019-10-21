@@ -20,19 +20,19 @@ urlpatterns = [
     url(r'^(?P<username>.+)/text/', views.add_message, name='text'),
     path('accounts/profile/FriendList.html', views.friends, name='F_list'),
     url(r'^(?P<username>.+)/post', views.add_post, name='post'),
+    url(r'^(?P<username>.+)/frd_post', views.add_post, name='frd_post'),
+
     path('accounts/profile/find', views.find_friends, name='find_frd'),
     path('accounts/profile/messenger.html', views.messenger, name='messenger'),
     #   path('signup/',views.signup, name='new user')
 
     path('accounts/profile/settings', views.settings, name='settings'),
-    path('accounts/profile/set_privacy/', views.set_priv, name='set_priv'),
+    path('set_settings/', views.set_settings, name='set_priv'),
     path('accounts/profile/groups/', views.groups, name='groups'),
     url(r'^(?P<groupname>.+)/(?P<username>.+)/gropacc', views.grp_accept, name='grp_accept'),
     url(r'^(?P<groupname>.+)/(?P<username>.+)/gropdec', views.grp_decline, name='grp_decline'),
-
     url(r'^(?P<groupname>.+)/grp', views.group_box, name='group_box'),
     url(r'^(?P<groupname>.+)/grop_text', views.grp_send, name='grp_send'),
-
     path('grp_find', views.join_grp, name='join_grp'),
     url(r'^(?P<groupname>.+)/send_grp_req', views.user_to_grp, name='useradd'),
     path('grp_create', views.create_grp, name='create_grp'),

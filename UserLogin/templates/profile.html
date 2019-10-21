@@ -1,16 +1,32 @@
 <table style="width:100%;">
     <td style="text-align:center;">
         <p>
-        <h1>{{ user.username }}</h1></p>
-        {% for name in frds %}
-        {% if name.username == user.username %}
-            <p><a href="/{{user.username}}/send_req">send request</a></p>
-        {% endif %}
-        {% endfor %}
+        <h1>{{ user.username }} </h1></p>
+            {% for name in reqs %}
+                {% if name == user.username %}
+                    <p><a href="/{{user.username}}/send_req">send request</a></p>
+                {% endif %}
+            {% endfor %}
+
     </td>
     <td style="text-align:center;">
+        {% if post %}
+            <p>
+            <form action="/{{user.username}}/frd_post" method="POST">
+                {% csrf_token %}
+                {{form.as_p}}
+                <input type="text" name="timeline_post" value="input text"><br/>
+                <input type="submit" value="post">
+            </form>
+            </p>
+        {% endif %}
         {% if pub or is_friend %}
             {% for elem in data %}
+            {% if elem.selfp %}
+                {{elem.from_t.username}}
+            {% else %}
+                {{elem.from_t.username}}->{{elem.to_t.username}}
+            {% endif %}
             <p>
                 {{elem.post}}
             <hr/>
@@ -20,11 +36,6 @@
     </td>
 
     <td style="text-align:center;">
-        {% for name in reqs %}
-        <p>{{name}} <a href="/{{name}}/accept">accept</a> <a href="/{{name}}/decline">decline</a></p>
-        {% endfor %}
-        {% if not reqs %}
-        <p> No new friend requests </p>
-        {% endif %}
+        <pre><p> </p></pre>
     </td>
 </table>

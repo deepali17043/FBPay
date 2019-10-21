@@ -1,9 +1,22 @@
 <h1>Settings</h1>
-<form action="/set_privacy/" method="POST">
+<form action="/set_settings/" method="POST">
     {% csrf_token %}
     {{form.as_p}}
-    <input type="radio" name="priv" value="friends">friends can post<br/>
-    <input type="radio" name="priv" value="not">friends can't post<br/>
+    Privacy : <br/>
+    <input type="radio" name="priv" value="yes">friends can post<br/>
+    <input type="radio" name="priv" value="no">friends can't post<br/>
+    <p>
+    Subscription : <br/>
+    <input type="radio" name="u_type" value="casual">Casual <br/>
+    <input type="radio" name="u_type" value="premium">Premium <br/>
+       <pre><p>
+         <input type="radio" name="pr_s" value="s">Silver (Rs. 50/month) <br/>
+         <input type="radio" name="pr_s" value="g">Gold (Rs. 100/month) <br/>
+         <input type="radio" name="pr_s" value="p">Platinum (Rs.150/month)<br/>
+        </p></pre>
+    <input type="radio" name="u_type" value="comm">Commercial (Rs 5000/annum)<br/>
+    </p>
     <input type="submit" value="save">
+    <br/>
 </form>
 <hr/>

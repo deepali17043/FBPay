@@ -89,30 +89,43 @@ def send_requests_to(user1):
         all = all.exclude(username=name.from_user)
     all = all.exclude(username=user1)
     return all
-
-def is_friend(user1,user2):
-    x = Friendship.objects.filter(user1=user1)
-    y = Friendship.objects.filter(user2=user1)
-    friends = list()
-    for elm in x:
-        friends.append(elm.user2.username)
-    for elm in y:
-        friends.append(elm.user1.username)
-    is_frd = False
-    if(user2.username) in friends:
-        is_frd = True
-    return is_frd
+#
+# def is_friend(user1,user2):
+#     x = Friendship.objects.filter(user1=user1)
+#     y = Friendship.objects.filter(user2=user1)
+#     friends = list()
+#     for elm in x:
+#         friends.append(elm.user2.username)
+#     for elm in y:
+#         friends.append(elm.user1.username)
+#     is_frd = False
+#     if(user2.username) in friends:
+#         is_frd = True
+#     return is_frd
 
 
 def other_profile(request, username):
     user1 = User.object.get(username=request.user)
     user = User.object.get(username=username)
     frds = send_requests_to(request.user)
-
-    yes = user.privacy
+    x = Friendship.objects.filter(user1=request.user)
+    y = Friendship.objects.filter(user2=request.user)
+    friends = list()
+    for elm in x:
+        friends.append(elm.user2.username)
+    for elm in y:
+        friends.append(elm.user1.username)
+    reqs = list()
+    for elm in frds:
+        if elm.username not in friends:
+            reqs.append(elm.username)
+    time = user.timeline
+    post = user.privacy
     data = Timeline.objects.filter(to_t=user)
-    is_frd = is_friend(user1,user)
-    return render(request, 'profile.html', {'user': user, 'frds': frds, 'pub': yes, 'data': data, 'is_friend':is_frd})
+    is_frd = Friendship.objects.filter(user1=user1,user2=user) | Friendship.objects.filter(user1=user,user2=user1)
+    for elm in reqs:
+        print(elm,"----*******----------")
+    return render(request, 'profile.html', {'user': user, 'reqs':reqs, 'pub': time,'post':post, 'data': data, 'is_friend':is_frd})
 
 
 def add_money(request, username):
@@ -142,7 +155,7 @@ def addfriend(request, username):
     user1 = request.user
     FriendshipRequest.objects.create(from_user=request.user, to_user=user2)
     print("request_sent")
-    url = request.build_absolute_uri('/').strip("/") + "/" + user2.username + "/timeline"
+    url = request.build_absolute_uri('/').strip("/") + "/accounts/profile/find"
     print(url)
     return redirect(url)
 
@@ -233,7 +246,10 @@ def messagebox(request, username):
 def add_post(request, username):
     user1 = User.object.get(username=request.user)
     user2 = User.object.get(username=username)
-    Timeline.objects.create(from_t=user1, to_t=user2, post=request.POST.get("timeline_post", ""))
+    selfp = True
+    if not user1 == user2:
+        selfp = False
+    Timeline.objects.create(from_t=user1, to_t=user2, post=request.POST.get("timeline_post", ""),selfp=selfp)
     url = request.build_absolute_uri('/').strip("/") + "/accounts/profile"
     return redirect(url)
 
@@ -243,13 +259,40 @@ def settings(request):
         raise Http404("user not logged in")
     return render(request, 'settings.html',{'user':request.user})
 
-def set_priv(request):
+
+def deduct(user,val):
+    user.balance = user.balance - val
+
+def set_settings(request):
     user = User.object.get(username=request.user)
     priv = request.POST.get("priv","")
-    if priv=="friends" :
+    u_type = request.POST.get("u_type","")
+    pr_S = request.POST.get("pr_s","")
+    if priv =="yes":
         user.privacy = True
     else:
         user.privacy = False
+    if u_type == "casual":
+        user.type = 1
+    elif u_type == "premium":
+        if pr_S == "s":
+            user.type = 2
+            deduct(user,50)  #to be done monthly
+        elif pr_S =='g':
+            user.type = 3
+            deduct(user,100) #to be done monthly
+        elif pr_S =='p':
+            user.type = 4
+            deduct(user,150) #to be done monthly
+        else:
+            user.type = 2
+            deduct(user,50)  #to be done monthly
+    elif u_type == "comm":
+        user.type = 5
+        deduct(user,5000) #to be done yearly
+    else:
+        user.type =1
+
     url = request.build_absolute_uri('/').strip("/") + "/accounts/profile"
     user.save()
     return redirect(url)
@@ -257,13 +300,13 @@ def set_priv(request):
 def grp_to_join(user1):
     #Groups.objects.create(group_name="No lifers",group_admin=user1)
     all = Groups.objects.all()
-    grps1 = GroupRequest.objects.filter(fro=user1,acc=False).values('group')
-    grps2 = Group_mem.objects.filter(user=user1).values('group')
+    grps1 = GroupRequest.objects.filter(fro=user1,acc=False)
+    grps2 = Group_mem.objects.filter(user=user1)
     grps = list()
     for elm in grps1:
-        grps.append(elm)
+        grps.append(elm.group.group_name)
     for elm in grps2:
-        grps.append(elm)
+        grps.append(elm.group.group_name)
     send = list()
     for elm in all:
         if elm.group_name not in grps:

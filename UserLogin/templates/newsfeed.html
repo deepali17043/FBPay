@@ -28,6 +28,11 @@
         </form>
         </p>
         {% for elem in posts %}
+            {% if elem.selfp %}
+                {{elem.from_t.username}}
+            {% else %}
+                {{elem.from_t.username}}->{{elem.to_t.username}}
+            {% endif %}
             <p>
                 {{elem.post}}
             <hr/>

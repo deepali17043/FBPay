@@ -1,4 +1,5 @@
 <h1>Join Groups</h1>
+<hr/>
 {% for element in grps %}
    <p>{{element.group_name}}<span class="tab">
    {% if element.group_closed %}
@@ -8,4 +9,8 @@
 
       <a href="/{{element.group_name}}/send_grp_req"><br/>  Join</a></p>
 {% endfor %}
+{% if not grps %}
+<p>No new groups to join</p>
+{% endif %}
 <hr/>
+
