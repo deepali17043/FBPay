@@ -10,7 +10,7 @@ urlpatterns = [
     path('accounts/profile/options.html', views.OptionsView.as_view(), name='options'),
     path('accounts/profile/newsfeed.html', views.OptionsView.as_view(), name='newsfeed'),
     path('accounts/profile/notify.html', views.OptionsView.as_view(), name='notifications'),
-    url(r'^(?P<username>.+)/ewallet', views.walletview, name='ewallet'),
+    path('accounts/profile/ewallet/', views.walletview, name='ewallet'),
     url(r'^(?P<username>.+)/accept', views.accept, name='accept'),
     url(r'^(?P<username>.+)/decline', views.decline, name='decline'),
     url(r'^(?P<username>.+)/messages', views.messagebox, name='messagebox'),
@@ -36,4 +36,5 @@ urlpatterns = [
     path('grp_find', views.join_grp, name='join_grp'),
     url(r'^(?P<groupname>.+)/send_grp_req', views.user_to_grp, name='useradd'),
     path('grp_create', views.create_grp, name='create_grp'),
+    path('accounts/profile/ewallet/wall_add/', views.add_money, name='add_money'),
 ]

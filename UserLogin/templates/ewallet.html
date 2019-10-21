@@ -1,60 +1,18 @@
-{{ user.authenticateuser }}
+
 <table style="width:100%;">
     <td style="text-align:center;">
-        <h3><a href="timeline.html">{{ user.username }}</a></h3>
+        <p><a href="wall_add">Add money</a></p>
         <hr/>
-        <p><a href="about.html">About</a></p>
+        <p><a href="money_to">Send money</a></p>
         <hr/>
-        <p><a href="FriendList.html">Friends</a></p>
-        <hr/>
-        <p><a href="groups">Groups</a></p>
-        <hr/>
-        <p><a href="messenger.html">MessageBox</a></p>
-        <hr/>
-        <p><a href="settings">Settings</a></p>
-        <hr/>
-        <p><a href="/{{ user.username }}/ewallet/" >ewallet</a></p>
-        <hr/>
-        <p><a href="/{{ user.username }}/logoutuser/">logout</a></p>
+        <p><a href="summary_acc">Account summary</a></p>
         <hr/>
     </td>
     <td style="text-align:center;">
-        <p>
-        <form action="/{{user.username}}/post" method="POST">
-            {% csrf_token %}
-            {{form.as_p}}
-            <input type="text" name="timeline_post" value="input text"><br/>
-            <input type="submit" value="post">
-        </form>
-        </p>
-        {% for elem in posts %}
-            <p>
-                {{elem.post}}
-            <hr/>
-            </p>
-        {% endfor %}
+        <h5> Wallet Balance : {{user.balance}}</h5>
     </td>
 
     <td style="text-align:center;">
-        <h5>Friend Requests</h5>
-        {% for name in freqs %}
-            <p>{{name.from_user.username}} <a href="/{{name.from_user.username}}/accept">accept</a>  <a href="/{{name.from_user.username}}/decline">decline</a></p>
-        {% endfor %}
-        {% if not freqs %}
-            <p> No new friend requests </p>
-        {% endif %}
-        <hr/>
-        <h5>Group Requests</h5>
-        {% for element in greqs %}
-        {% for elm in element %}
-            <pre><p>{{elm.group.group_name}}<br/>{{elm.fro.username}}   <a href="/{{elm.group.group_name}}/{{elm.fro.username}}/gropacc">accept</a> <a href="/{{elm.group.group_name}}/{{elm.fro.username}}/gropdec">decline</a></p>
-            <br/></pre>
-                {% endfor %}
-            <hr/>
-        {% endfor %}
-        {% if not greqs %}
-            <p> No new group requests </p>
-            <hr/>
-        {% endif %}
+
     </td>
 </table>

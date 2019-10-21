@@ -60,9 +60,9 @@ def logoutuser(request, username):
     return redirect('logout')
 
 
-def walletview(request, username):
+def walletview(request):
     # print(username)
-    user = User.object.get(username=username)
+    user = User.object.get(username=request.user)
     if user.isauthenticated() == 1:
         print(user.username)
         raise Http404("user not logged in")
@@ -128,13 +128,16 @@ def other_profile(request, username):
     return render(request, 'profile.html', {'user': user, 'reqs':reqs, 'pub': time,'post':post, 'data': data, 'is_friend':is_frd})
 
 
-def add_money(request, username):
+def add_money(request):
     # print(username)
-    user = User.object.get(username=username)
+    user = User.object.get(username=request.user)
     if user.isauthenticated() == 1:
         print(user.username)
         raise Http404("user not logged in")
-    return render(request, 'ewallet.html', {'balance': user.balance})
+    #val = request.POST.get("val","")
+    user.balance = user.balance + 10
+    user.save()
+    return render(request, 'ewallet.html', {'user': user})
 
 
 
