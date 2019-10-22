@@ -37,7 +37,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'UserLogin'
+    'UserLogin',
+
+    'django_otp',
+    'django_otp.plugins.otp_static',
+    'django_otp.plugins.otp_totp',
+    'two_factor',
 ]
 
 MIDDLEWARE = [
@@ -46,6 +51,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django_otp.middleware.OTPMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -123,3 +129,12 @@ STATIC_URL = '/static/'
 #LOGIN_REDIRECT_URL = '/base.html'
 LOGOUT_REDIRECT_URL = '/login/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 465
+EMAIL_HOST_USER = 'otpverifier80@gmail.com'
+EMAIL_HOST_PASSWORD = 'TOTPVerifer@FCSProject'
+EMAIl_USE_TLS = False
+EMAIL_USE_SSL = True
+
