@@ -1,9 +1,5 @@
 from django.http import Http404
 from django.shortcuts import render, redirect
-from django.http import HttpRequest
-
-
-# Create your views here.
 from django.views.generic import TemplateView
 from django.contrib.auth.forms import UserCreationForm
 from django.views import generic
@@ -11,7 +7,10 @@ from django.urls import reverse_lazy
 from django.http import HttpResponse
 from .forms import CustomUserCreationForm
 from .models import User, FriendshipRequest, Friendship, MessageBox, Timeline
-from .models import Groups,Group_mem,Group_messages,GroupRequest
+from .models import Groups, Group_mem, Group_messages, GroupRequest
+from .transactions import OTPVerifier
+import time
+
 
 class OptionsView(TemplateView):
     template_name = 'options.html'
@@ -137,8 +136,9 @@ def add_money(request):
     #val = request.POST.get("val","")
     user.balance = user.balance + 10
     user.save()
-    return render(request, 'ewallet.html', {'user': user})
-
+    url = request.build_absolute_uri('/').strip("/") + "/accounts/profile/ewallet"
+    print(url)
+    return redirect(url)
 
 
 def friends(request):
@@ -256,6 +256,7 @@ def add_post(request, username):
     url = request.build_absolute_uri('/').strip("/") + "/accounts/profile"
     return redirect(url)
 
+
 def settings(request):
     user = User.object.get(username=request.user)
     if not request.user.is_authenticated:
@@ -265,6 +266,7 @@ def settings(request):
 
 def deduct(user,val):
     user.balance = user.balance - val
+
 
 def set_settings(request):
     user = User.object.get(username=request.user)
@@ -300,6 +302,7 @@ def set_settings(request):
     user.save()
     return redirect(url)
 
+
 def grp_to_join(user1):
     #Groups.objects.create(group_name="No lifers",group_admin=user1)
     all = Groups.objects.all()
@@ -333,6 +336,7 @@ def user_to_grp(request,groupname):
     url = request.build_absolute_uri('/').strip("/") + "/accounts/profile"
     print(url)
     return redirect(url)
+
 
 def group_box(request,groupname):
     print("innn here-----")
@@ -379,6 +383,7 @@ def grp_accept(request,groupname,username):
     print(url)
     return redirect(url)
 
+
 def grp_decline(request,groupname,username):
     group = Groups.objects.get(group_name=groupname)
     user = User.object.get(username=username)
@@ -391,3 +396,22 @@ def grp_decline(request,groupname,username):
     url = request.build_absolute_uri('/').strip("/") + "/accounts/profile"
     print(url)
     return redirect(url)
+
+
+def TransactionView(request):
+    OTPVerifierObject = OTPVerifier()
+    OTPVerifierObject.setuser(request.user)
+    GenerationTime = time.time()
+    GeneratedToken = OTPVerifierObject.GenerateToken()
+    print('Generated Token:', GeneratedToken)
+    UserToken = int(input())
+    while time.time() <= GenerationTime + OTPVerifierObject.TokenValidityTime:
+        t = OTPVerifierObject.VerifyToken(UserToken, tolerance=1)
+    if t:
+        url = request.build_absolute_uri('/').strip("/") + "/accounts/profile/ewallet/walletadd"
+        print(url)
+        return redirect(url)
+    else:
+        raise Http404('Incorrect OTP entered')
+
+
