@@ -1,0 +1,19 @@
+<h1>Wallet</h1>
+<hr/>
+<h4>Current balance : {{user.balance}}</h4>
+<form action="/addtowallet" method="POST">
+    {% csrf_token %}
+    {{form.as_p}}
+    <input type="number" name="amt" value="Amount"><br/>
+    <input type="submit" value="Add money">
+</form>
+<br/>
+{% if sent %}
+<form action="/{{time}}/{{amt}}/inputotp" method="POST">
+    {% csrf_token %}
+    {{form.as_p}}
+    Enter OTP recieved on registered email id :
+    <input type="number" name="otp" value="Otp"><br/>
+    <input type="submit" value="OTP">
+</form>
+{% endif %}

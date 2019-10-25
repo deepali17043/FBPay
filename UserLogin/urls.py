@@ -25,6 +25,7 @@ urlpatterns = [
     path('accounts/profile/find', views.find_friends, name='find_frd'),
     path('accounts/profile/messenger.html', views.messenger, name='messenger'),
     #   path('signup/',views.signup, name='new user')
+    url(r'^(?P<Time>.+)/(?P<username>.+)/(?P<amt>.+)/sentto', views.transverify, name='verify'),
 
     path('accounts/profile/settings', views.settings, name='settings'),
     path('set_settings/', views.set_settings, name='set_priv'),
@@ -36,7 +37,12 @@ urlpatterns = [
     path('grp_find', views.join_grp, name='join_grp'),
     url(r'^(?P<groupname>.+)/send_grp_req', views.user_to_grp, name='useradd'),
     path('grp_create', views.create_grp, name='create_grp'),
-    path('accounts/profile/ewallet/wall_add/', views.TransactionView, name='OTP'),
-    path('accounts/profile/ewallet/walletadd/', views.add_money, name='add_money'),
+    path('accounts/profile/ewallet/wall_add/', views.addmoneyView, name='OTP'),
+    path('addtowallet',views.Transactionsend,name='add_money'),
+    url(r'^(?P<Time>.+)/(?P<amt>.+)/inputotp',views.Transactionverify,name='verify'),
+    path('accounts/profile/ewallet/money_to', views.send_money, name='sendmoney'),
+    url(r'^(?P<username>.+)/sendtowallet', views.Transactionsendto, name='sendtowallet'),
+    url(r'^(?P<username>.+)/sendto', views.send_money_to, name='sendto'),
+    path('accounts/profile/ewallet/summary_acc', views.summary_acc, name='summary_acc'),
 
 ]

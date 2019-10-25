@@ -138,5 +138,11 @@ class GroupRequest(models.Model):
     acc = models.BooleanField(default=False)
 
 
-
-
+class AccountSummary(models.Model):
+    from_t = models.ForeignKey(User, on_delete=models.CASCADE, related_name="from1")
+    to_t = models.ForeignKey(User, on_delete=models.CASCADE, related_name="to2")
+    datetime = models.DateTimeField(auto_now=True)
+    amtsent = models.IntegerField()
+    balance1 = models.IntegerField()
+    balance2 = models.IntegerField()
+    selfp = models.BooleanField(default=True)

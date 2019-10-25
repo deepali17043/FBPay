@@ -7,7 +7,7 @@ from django.urls import reverse_lazy
 from django.http import HttpResponse
 from .forms import CustomUserCreationForm
 from .models import User, FriendshipRequest, Friendship, MessageBox, Timeline
-from .models import Groups, Group_mem, Group_messages, GroupRequest
+from .models import Groups, Group_mem, Group_messages, GroupRequest,  AccountSummary
 from .transactions import OTPVerifier
 import time
 
@@ -42,7 +42,7 @@ def grp_requests(user):
 def ProfileView(request):
     user = User.object.get(username=request.user)
     reqs = get_pending_requests(user)
-    posts = Timeline.objects.filter(from_t=request.user, to_t=request.user)
+    posts = Timeline.objects.filter(from_t=request.user) | Timeline.objects.filter(to_t=request.user)
     greqs = grp_requests(user)
     return render(request, 'newsfeed.html', {'user': user, 'freqs': reqs, 'posts': posts,'greqs':greqs})
 
@@ -126,20 +126,11 @@ def other_profile(request, username):
         print(elm,"----*******----------")
     return render(request, 'profile.html', {'user': user, 'reqs':reqs, 'pub': time,'post':post, 'data': data, 'is_friend':is_frd})
 
-
-def add_money(request):
-    # print(username)
+def addmoneyView(request):
     user = User.object.get(username=request.user)
     if user.isauthenticated() == 1:
-        print(user.username)
         raise Http404("user not logged in")
-    #val = request.POST.get("val","")
-    user.balance = user.balance + 10
-    user.save()
-    url = request.build_absolute_uri('/').strip("/") + "/accounts/profile/ewallet"
-    print(url)
-    return redirect(url)
-
+    return render(request,'addmoney.html',{'user':user})
 
 def friends(request):
     x = Friendship.objects.filter(user1=request.user)
@@ -372,7 +363,6 @@ def grp_send(request,groupname):
 def grp_accept(request,groupname,username):
     group = Groups.objects.get(group_name=groupname)
     user = User.object.get(username=username)
-    print(username,"kjdsku I sent this")
     exist = GroupRequest.objects.filter(group=group,fro=user, acc=False)
     if exist:
         Group_mem.objects.create(user=user,group=group)
@@ -398,20 +388,96 @@ def grp_decline(request,groupname,username):
     return redirect(url)
 
 
-def TransactionView(request):
+def Transactionsend(request):
+    user = User.object.get(username=request.user)
+    if user.isauthenticated() == 1:
+        print(user.username)
+        raise Http404("user not logged in")
+    amt = request.POST.get("amt","")
     OTPVerifierObject = OTPVerifier()
     OTPVerifierObject.setuser(request.user)
     GenerationTime = time.time()
     GeneratedToken = OTPVerifierObject.GenerateToken()
-    print('Generated Token:', GeneratedToken)
-    UserToken = int(input())
-    while time.time() <= GenerationTime + OTPVerifierObject.TokenValidityTime:
+    return render(request, 'addmoney.html', {'user': user, 'time': GenerationTime, 'sent': True, 'amt':amt})
+
+def Transactionverify(request, Time, amt):
+    user = User.object.get(username=request.user)
+    UserToken = int(request.POST.get("otp",""))
+    #Time = time
+    OTPVerifierObject = OTPVerifier()
+    OTPVerifierObject.setuser(request.user)
+    t = False
+    while time.time() <= float(Time) + OTPVerifierObject.TokenValidityTime:
         t = OTPVerifierObject.VerifyToken(UserToken, tolerance=1)
     if t:
-        url = request.build_absolute_uri('/').strip("/") + "/accounts/profile/ewallet/walletadd"
-        print(url)
+        user.balance = user.balance + int(amt)
+        user.save()
+        AccountSummary.objects.create(from_t=user, to_t=user, amtsent=int(amt), balance1=user.balance,balance2=user.balance, selfp=True)
+        url = request.build_absolute_uri('/').strip("/") + "/accounts/profile/ewallet"
         return redirect(url)
     else:
         raise Http404('Incorrect OTP entered')
+
+
+def send_money(request):
+    x = Friendship.objects.filter(user1=request.user)
+    y = Friendship.objects.filter(user2=request.user)
+    friends = list()
+    for elm in x:
+        friends.append(elm.user2.username)
+    for elm in y:
+        friends.append(elm.user1.username)
+    return render(request, 'send_money.html', {'friends': friends})
+
+
+def send_money_to(request, username):
+    user = User.object.get(username=request.user)
+    if user.isauthenticated() == 1:
+        raise Http404("user not logged in")
+    return render(request, 'sendmoneyform.html', {'user': user,'username':username})
+
+
+def Transactionsendto(request,username):
+    user = User.object.get(username=request.user)
+    if user.isauthenticated() == 1:
+        print(user.username)
+        raise Http404("user not logged in")
+    amt = request.POST.get("amt","")
+    if (user.balance - int(amt) < 0):
+        raise Http404("Insufficient balance")
+    OTPVerifierObject = OTPVerifier()
+    OTPVerifierObject.setuser(request.user)
+    GenerationTime = time.time()
+    GeneratedToken = OTPVerifierObject.GenerateToken()
+    return render(request, 'sendmoneyform.html', {'user': user, 'time': GenerationTime, 'sent': True, 'amt':amt,'username':username})
+
+
+def transverify(request,username, Time, amt):
+    user2 = User.object.get(username=username)
+    user1 = User.object.get(username=request.user)
+    UserToken = int(request.POST.get("otp",""))
+    #Time = time
+    OTPVerifierObject = OTPVerifier()
+    OTPVerifierObject.setuser(request.user)
+    t = False
+    while time.time() <= float(Time) + OTPVerifierObject.TokenValidityTime:
+        t = OTPVerifierObject.VerifyToken(UserToken, tolerance=1)
+    if t:
+        user1.balance = user1.balance - int(amt)
+        user1.save()
+        user2.balance = user2.balance + int(amt)
+        user2.save()
+        AccountSummary.objects.create(from_t=user1,to_t=user2,amtsent=int(amt),balance1=user1.balance,balance2=user2.balance,selfp=False)
+        url = request.build_absolute_uri('/').strip("/") + "/accounts/profile/ewallet"
+        return redirect(url)
+    else:
+        raise Http404('Incorrect OTP entered')
+
+
+def summary_acc(request):
+    user1 = User.object.get(username=request.user)
+    summary = AccountSummary.objects.filter(from_t=user1) | AccountSummary.objects.filter(to_t=user1)
+    summary = summary.order_by('datetime')
+    return render(request, 'account.html', {'summary':summary, 'user':user1})
 
 

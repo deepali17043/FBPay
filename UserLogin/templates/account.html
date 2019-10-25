@@ -1,0 +1,20 @@
+<h1>Account Summary : </h1><h2>{{user.name}}</h2>
+{% for element in summary %}
+    {% if element.selfp %}
+    <p> Amount added to wallet <br/>
+        Amount : {{element.amtsent}} Updated balance: {{element.balance1}}<br/>
+    </p>
+    {% else %}
+        {% if element.from_t.name == user.name %}
+        <p>Sent to {{element.to_t.name}}<br/>
+            Amount : {{element.amtsent}} Updated balance: {{element.balance1}}<br/>
+        </p>
+
+        {% else %}
+        <p>Recieved from {{element.from_t.name}}<br/>
+            Amount : {{element.amtsent}} Updated balance: {{element.balance2}}<br/>
+        </p>
+        {% endif %}
+    {% endif %}
+{% endfor %}
+<hr/>
