@@ -2,15 +2,24 @@
 <hr/>
 {% for element in grps %}
    <p>{{element.group_name}}<span class="tab">
-   {% if element.group_closed %}
-         (Closed)
+       Cost to join group : {{element.group_price}}
+       {% if element.group_closed %}
+         (Closed, amount will be deducted automatically from ewallet)
       {% endif %}
    </span>
-
       <a href="/{{element.group_name}}/send_grp_req"><br/>  Join</a></p>
 {% endfor %}
-{% if not grps %}
-<p>No new groups to join</p>
+{% if sent %}
+<form action="/{{time}}/{{gp.group_name}}/otpgrp" method="POST">
+    {% csrf_token %}
+    {{form.as_p}}
+    Enter OTP recieved on registered email id :
+    <input type="number" name="otp" value="Otp"><br/>
+    <input type="submit" value="OTP">
+</form>
 {% endif %}
+   {% if not grps %}
+      <p>No new groups to join</p>
+   {% endif %}
 <hr/>
 

@@ -11,6 +11,7 @@ urlpatterns = [
     path('accounts/profile/newsfeed.html', views.OptionsView.as_view(), name='newsfeed'),
     path('accounts/profile/notify.html', views.OptionsView.as_view(), name='notifications'),
     path('accounts/profile/ewallet/', views.walletview, name='ewallet'),
+    path('accounts/profile/pages', views.pages, name='pages'),
     url(r'^(?P<username>.+)/accept', views.accept, name='accept'),
     url(r'^(?P<username>.+)/decline', views.decline, name='decline'),
     url(r'^(?P<username>.+)/messages', views.messagebox, name='messagebox'),
@@ -44,5 +45,9 @@ urlpatterns = [
     url(r'^(?P<username>.+)/sendtowallet', views.Transactionsendto, name='sendtowallet'),
     url(r'^(?P<username>.+)/sendto', views.send_money_to, name='sendto'),
     path('accounts/profile/ewallet/summary_acc', views.summary_acc, name='summary_acc'),
+    path('crtpg', views.create_page, name='create_page'),
+    url(r'^(?P<pgname>.+)/pg', views.viewpg, name='viewpg'),
+    url(r'^(?P<pgname>.+)/popg', views.post_pg, name='pgpo'),
+    url(r'^(?P<Time>.+)/(?P<groupname>.+)/otpgrp', views.sendtogrp, name='sendgrp'),
 
 ]

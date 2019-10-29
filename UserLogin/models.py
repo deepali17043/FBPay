@@ -118,6 +118,7 @@ class Groups(models.Model):
     group_name = models.CharField(max_length=200)
     group_closed = models.BooleanField(default=False)
     group_admin = models.ForeignKey(User, on_delete=models.CASCADE, related_name="grp_admin1")
+    group_price = models.IntegerField(default=0)
 
 
 class Group_mem(models.Model):
@@ -142,7 +143,22 @@ class AccountSummary(models.Model):
     from_t = models.ForeignKey(User, on_delete=models.CASCADE, related_name="from1")
     to_t = models.ForeignKey(User, on_delete=models.CASCADE, related_name="to2")
     datetime = models.DateTimeField(auto_now=True)
+    # mn = models.CharField(max_length=50,default="")
     amtsent = models.IntegerField()
     balance1 = models.IntegerField()
     balance2 = models.IntegerField()
     selfp = models.BooleanField(default=True)
+
+
+class Pages(models.Model):
+    id = models.IntegerField(auto_created=True,primary_key=True)
+    name = models.CharField(max_length=1000,unique=True)
+    admin = models.ForeignKey(User, on_delete=models.CASCADE, related_name="adm")
+    date = models.DateField(auto_now=True)
+
+
+class PageContent(models.Model):
+    page = models.ForeignKey(Pages, on_delete=models.CASCADE,related_name="pg")
+    post = models.CharField(max_length=3000)
+    datetime = models.DateTimeField(auto_now=True)
+

@@ -1,7 +1,13 @@
 
 <h1>Messenger</h1>
+{% if bol %}
+{% for element in all %}
+    <a href="/{{element}}/messages/">{{element}}</a><br/>
+{% endfor %}
+{% else %}
 {% for element in friends %}
     <a href="/{{element}}/messages/">{{element}}</a><br/>
 {% endfor %}
+{% endif %}
 <hr/>
 <br/>

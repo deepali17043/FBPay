@@ -1,0 +1,17 @@
+<h1>{{pg.name}}</h1>
+{% for element in posts %}
+    <p>{{element.post}}<br/>
+    <hr/>
+    </p>
+{% endfor %}
+<hr/>
+
+{% if opt %}
+<form action="/{{pg.name}}/popg" method="POST">
+    {% csrf_token %}
+    {{form.as_p}}
+    <input type="text" name="pst" value="input text"><br/>
+    <input type="submit" value="Post">
+</form>
+<br/>
+{% endif %}

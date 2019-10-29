@@ -1,0 +1,15 @@
+<h1>Pages</h1>
+{% for element in pg %}
+    <a href="/{{element.name}}/pg">{{element.name}} </a><br/>
+{% endfor %}
+<hr/>
+<br/>
+{% if bol %}
+<form action="/crtpg" method="POST">
+    {% csrf_token %}
+    {{form.as_p}}
+    <input type="text" name="pgnm" value="page_name"><br/>
+    <input type="submit" value="create page">
+</form>
+<br/>
+{% endif %}

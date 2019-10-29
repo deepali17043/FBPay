@@ -7,10 +7,10 @@ from django.urls import reverse_lazy
 from django.http import HttpResponse
 from .forms import CustomUserCreationForm
 from .models import User, FriendshipRequest, Friendship, MessageBox, Timeline
-from .models import Groups, Group_mem, Group_messages, GroupRequest,  AccountSummary
+from .models import Groups, Group_mem, Group_messages, GroupRequest,  AccountSummary, Pages, PageContent
 from .transactions import OTPVerifier
 import time
-
+from datetime import date
 
 class OptionsView(TemplateView):
     template_name = 'options.html'
@@ -75,7 +75,10 @@ def groups(request):
     grp = Group_mem.objects.filter(user=user)
     for el in grp:
         print(el.group.group_name)
-    return render(request, 'groups.html', {'grp':grp})
+    flag = True
+    if user.type==1:
+        flag = False
+    return render(request, 'groups.html', {'grp':grp, 'bol':flag})
 
 
 def send_requests_to(user1):
@@ -126,11 +129,13 @@ def other_profile(request, username):
         print(elm,"----*******----------")
     return render(request, 'profile.html', {'user': user, 'reqs':reqs, 'pub': time,'post':post, 'data': data, 'is_friend':is_frd})
 
+
 def addmoneyView(request):
     user = User.object.get(username=request.user)
     if user.isauthenticated() == 1:
         raise Http404("user not logged in")
     return render(request,'addmoney.html',{'user':user})
+
 
 def friends(request):
     x = Friendship.objects.filter(user1=request.user)
@@ -218,12 +223,17 @@ def add_message(request, username):
 def messenger(request):
     x = Friendship.objects.filter(user1=request.user)
     y = Friendship.objects.filter(user2=request.user)
+    all=User.object.exclude(username=request.user)
+
     friends = list()
     for elm in x:
         friends.append(elm.user2.username)
     for elm in y:
         friends.append(elm.user1.username)
-    return render(request, 'message.html', {'friends': friends})
+    fl=False
+    if request.user.type==5:
+        fl=True
+    return render(request, 'message.html', {'friends': friends,'bol':fl,'all':all})
 
 
 def messagebox(request, username):
@@ -313,21 +323,31 @@ def grp_to_join(user1):
 
 def join_grp(request):
     grps = grp_to_join(request.user)
-    return render(request, 'join_groups.html', {'grps': grps})
+    return render(request, 'join_groups.html', {'grps': grps, 'sent':False})
 
 
 def user_to_grp(request,groupname):
     grp = Groups.objects.get(group_name=groupname)
     user = User.object.get(username=request.user)
+    if user.isauthenticated() == 1:
+        print(user.username)
+        raise Http404("user not logged in")
+    grps = grp_to_join(request.user)
     if not grp.group_closed:
         Group_mem.objects.create(user=user,group=grp)
     else:
-        GroupRequest.objects.create(group=grp, fro=user)
+        if not grp.group_price==0:
+            OTPVerifierObject = OTPVerifier()
+            OTPVerifierObject.setuser(request.user)
+            GenerationTime = time.time()
+            GeneratedToken = OTPVerifierObject.GenerateToken()
+            return render(request, 'join_groups.html', {'user': user,'grps':grps,'time': GenerationTime, 'sent': True,'gp':grp })
+        else:
+            GroupRequest.objects.create(group=grp, fro=user)
         print("group_request_sent")
-    url = request.build_absolute_uri('/').strip("/") + "/accounts/profile"
+    url = request.build_absolute_uri('/').strip("/") + "/grp_find"
     print(url)
     return redirect(url)
-
 
 def group_box(request,groupname):
     print("innn here-----")
@@ -347,7 +367,14 @@ def create_grp(request):
     grp = False
     if c == "yes":
         grp = True
-    Groups.objects.create(group_name=request.POST.get("grp_name", ""),group_admin=user, group_closed=grp)
+    print(Groups.objects.filter(group_admin=user, group_closed=True).count(),"hhhh")
+    print(user.type,"usertype")
+    if user.type==2 and Groups.objects.filter(group_admin=user, group_closed=True).count()>1:
+        raise Http404("sorry cannot create more groups")
+    elif user.type==3 and Groups.objects.filter(group_admin=user, group_closed=True).count()>3:
+        raise Http404("sorry cannot create more groups")
+
+    Groups.objects.create(group_name=request.POST.get("grp_name", ""),group_admin=user, group_closed=grp, group_price=request.POST.get("price", ""))
     Group_mem.objects.create(user=user,group=Groups.objects.get(group_name=request.POST.get("grp_name", "")))
     url = request.build_absolute_uri('/').strip("/") + "/accounts/profile/groups"
     return redirect(url)
@@ -366,6 +393,8 @@ def grp_accept(request,groupname,username):
     exist = GroupRequest.objects.filter(group=group,fro=user, acc=False)
     if exist:
         Group_mem.objects.create(user=user,group=group)
+        user.balance = user.balance - group.group_price
+        user.save()
         GroupRequest.objects.filter(group=group,fro=user).delete()
     else:
         raise Http404("sorry, this user did not send you a group request")
@@ -393,6 +422,17 @@ def Transactionsend(request):
     if user.isauthenticated() == 1:
         print(user.username)
         raise Http404("user not logged in")
+
+    tod = date.today()
+    print(tod)
+    summary = AccountSummary.objects.filter(from_t=user,datetime__month=tod.month) | AccountSummary.objects.filter(to_t=user, datetime__month=tod.month)
+    no_trans = summary.count()
+    print(no_trans, "************")
+    if user.type == 1 and no_trans > 15:
+        raise Http404("Exceeded limit of transaction")
+    elif (user.type == 2 or user.type == 3 or user.type == 4) and no_trans > 30:
+        raise Http404("Exceeded limit of transaction")
+
     amt = request.POST.get("amt","")
     OTPVerifierObject = OTPVerifier()
     OTPVerifierObject.setuser(request.user)
@@ -445,6 +485,16 @@ def Transactionsendto(request,username):
     amt = request.POST.get("amt","")
     if (user.balance - int(amt) < 0):
         raise Http404("Insufficient balance")
+    tod = date.today()
+    print(tod)
+    summary = AccountSummary.objects.filter(from_t=user,datetime__month=tod.month) | AccountSummary.objects.filter(to_t=user,datetime__month=tod.month)
+    no_trans = summary.count()
+    print(no_trans,"************")
+    if user.type == 1 and no_trans > 15:
+        raise Http404("Exceeded limit of transaction")
+    elif (user.type == 2 or user.type == 3 or user.type == 4) and no_trans > 30:
+        raise Http404("Exceeded limit of transaction")
+
     OTPVerifierObject = OTPVerifier()
     OTPVerifierObject.setuser(request.user)
     GenerationTime = time.time()
@@ -480,4 +530,51 @@ def summary_acc(request):
     summary = summary.order_by('datetime')
     return render(request, 'account.html', {'summary':summary, 'user':user1})
 
+def pages(request):
+    li = Pages.objects.all()
+    user = User.object.get(username=request.user)
+    flag =  False
+    if user.type==5:
+        flag=True
+    return render(request, 'pages.html', {'pg':li,'user':user, 'bol':flag})
 
+
+def create_page(request):
+    user = User.object.get(username=request.user)
+    Pages.objects.create(name=request.POST.get("pgnm", ""), admin=user)
+    url = request.build_absolute_uri('/').strip("/") + "/accounts/profile/pages"
+    return redirect(url)
+
+def viewpg(request,pgname):
+    user = User.object.get(username=request.user)
+    pg = Pages.objects.get(name=pgname)
+    opt = False
+    if user==pg.admin:
+        opt = True
+    psts = PageContent.objects.filter(page=pg)
+    psts = psts.order_by('datetime')
+    return render(request, 'pgbox.html', {'posts': psts, 'pg': pg,'opt':opt})
+
+
+def post_pg(request,pgname):
+    user = User.object.get(username=request.user)
+    pg = Pages.objects.get(name=pgname)
+    PageContent.objects.create(page=pg, post=request.POST.get("pst", ""))
+    return viewpg(request, pgname)
+
+
+def sendtogrp(request, Time, groupname):
+    grp = Groups.objects.get(group_name=groupname)
+    user = User.object.get(username=request.user)
+    UserToken = int(request.POST.get("otp",""))
+    OTPVerifierObject = OTPVerifier()
+    OTPVerifierObject.setuser(request.user)
+    t = False
+    while time.time() <= float(Time) + OTPVerifierObject.TokenValidityTime:
+        t = OTPVerifierObject.VerifyToken(UserToken, tolerance=1)
+    if t:
+        GroupRequest.objects.create(group=grp, fro=user)
+        url = request.build_absolute_uri('/').strip("/") + "/grp_find"
+        return redirect(url)
+    else:
+        raise Http404('Incorrect OTP entered')
