@@ -279,6 +279,8 @@ def settings(request):
 
 
 def deduct(user,val):
+    if user.balance - val < 0:
+        raise Http404('Insufficient Balance')
     user.balance = user.balance - val
 
 
@@ -588,7 +590,7 @@ def transverify(request,username, Time, amt):
 def summary_acc(request):
     user1 = User.object.get(username=request.user)
     summary = AccountSummary.objects.filter(from_t=user1) | AccountSummary.objects.filter(to_t=user1)
-    summary = summary.order_by('datetime')
+    summary = summary.order_by('-datetime')
     return render(request, 'account.html', {'summary':summary, 'user':user1})
 
 
@@ -615,7 +617,7 @@ def viewpg(request,pgname):
     if user==pg.admin:
         opt = True
     psts = PageContent.objects.filter(page=pg)
-    psts = psts.order_by('datetime')
+    psts = psts.order_by('-datetime')
     return render(request, 'pgbox.html', {'posts': psts, 'pg': pg,'opt':opt})
 
 

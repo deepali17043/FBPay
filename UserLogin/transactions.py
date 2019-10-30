@@ -15,7 +15,7 @@ class OTPVerifier():
     digits = 6
     verified = models.BooleanField(default=False)
     lasttotpt = -1
-    TokenValidityTime = 40
+    TokenValidityTime = 60
 
     def setuser(self, username):
         self.user = User.object.get(username=username)
