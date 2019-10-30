@@ -243,7 +243,8 @@ def messenger(request):
     li = list()
     for i in lis:
         if i.from_m.username not in friends:
-            li.append(i.from_m.username)
+            if i.from_m.username not in li:
+                li.append(i.from_m.username)
 
     return render(request, 'message.html', {'friends': friends,'bol':fl,'all':all,'li':li})
 
@@ -670,4 +671,16 @@ def remove_user(request, username, groupname):
 
 def HomePage(request):
     url = request.build_absolute_uri('/').strip("/") + "/login"
+    return redirect(url)
+
+def unfriend(request, username):
+    user = User.object.get(username=request.user)
+    user2 = User.object.get(username=username)
+    x = Friendship.objects.filter(user1=user, user2=user2)
+    if x:
+        x.delete()
+    y = Friendship.objects.filter(user1=user2,user2=user)
+    if y:
+        y.delete()
+    url = request.build_absolute_uri('/').strip("/") + "/accounts/profile/FriendList.html"
     return redirect(url)

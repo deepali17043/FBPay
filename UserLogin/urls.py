@@ -56,5 +56,6 @@ urlpatterns = [
     url(r'^(?P<Time>.+)/(?P<pri>.+)/privotp', views.setprivverify, name='chngutype'),
     url(r'^(?P<username>.+)/(?P<groupname>.+)/rem', views.remove_user, name='remove_user'),
     url(r'^(?P<groupname>.+)/remove', views.remuser, name='remuser'),
+    url(r'^(?P<username>.+)/unfriend', views.unfriend, name='unfriend'),
 
 ]
