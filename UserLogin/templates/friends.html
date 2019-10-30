@@ -1,7 +1,6 @@
-
 <h1>Friends</h1>
 {% for element in friends %}
-    <a href="/{{element}}/timeline">{{element}} </a><br/>
+    <a href="/{{element.username}}/timeline">{{element.name}} </a><br/>
 {% endfor %}
 <hr/>
 <br/>

@@ -11,6 +11,7 @@ from .models import Groups, Group_mem, Group_messages, GroupRequest,  AccountSum
 from .transactions import OTPVerifier
 import time
 from datetime import date
+from random import shuffle
 
 class OptionsView(TemplateView):
     template_name = 'options.html'
@@ -142,9 +143,9 @@ def friends(request):
     y = Friendship.objects.filter(user2=request.user)
     friends = list()
     for elm in x:
-        friends.append(elm.user2.username)
+        friends.append(elm.user2)
     for elm in y:
-        friends.append(elm.user1.username)
+        friends.append(elm.user1)
     return render(request, 'friends.html', {'friends': friends})
 
 
@@ -171,7 +172,7 @@ def find_friends(request):
     reqs = list()
     for elm in frds:
         if elm.username not in friends:
-            reqs.append(elm.username)
+            reqs.append(elm)
     # all = Friendship.objects.all()
     # for x in all:
     #      x.delete()
@@ -233,7 +234,16 @@ def messenger(request):
     fl=False
     if request.user.type==5:
         fl=True
-    return render(request, 'message.html', {'friends': friends,'bol':fl,'all':all})
+
+
+    user = User.object.get(username=request.user)
+    lis = MessageBox.objects.filter(to_m=user)
+    li = list()
+    for i in lis:
+        if i.from_m.username not in friends:
+            li.append(i.from_m.username)
+
+    return render(request, 'message.html', {'friends': friends,'bol':fl,'all':all,'li':li})
 
 
 def messagebox(request, username):
@@ -269,39 +279,83 @@ def deduct(user,val):
     user.balance = user.balance - val
 
 
-def set_settings(request):
+def setpriv(request):
     user = User.object.get(username=request.user)
+    if user.isauthenticated() == 1:
+        raise Http404("user not logged in")
     priv = request.POST.get("priv","")
+    OTPVerifierObject = OTPVerifier()
+    OTPVerifierObject.setuser(request.user)
+    GenerationTime = time.time()
+    GeneratedToken = OTPVerifierObject.GenerateToken()
+    return render(request, 'settings.html', {'user': user, 'time': GenerationTime, 'sent2': True, 'pri': priv,'x':virkey()})
+
+
+def setprivverify(request, Time, pri):
+    user = User.object.get(username=request.user)
+    UserToken = int(request.POST.get("otp", ""))
+    # Time = time
+    OTPVerifierObject = OTPVerifier()
+    OTPVerifierObject.setuser(request.user)
+    t = False
+    while time.time() <= float(Time) + OTPVerifierObject.TokenValidityTime:
+        t = OTPVerifierObject.VerifyToken(UserToken, tolerance=1)
+    if t:
+        if pri == "yes":
+            user.privacy = True
+        else:
+            user.privacy = False
+        user.save()
+        url = request.build_absolute_uri('/').strip("/") + "/accounts/profile/"
+        return redirect(url)
+    else:
+        raise Http404('Incorrect OTP entered')
+
+
+def setutype(request):
+    user = User.object.get(username=request.user)
+    if user.isauthenticated() == 1:
+        raise Http404("user not logged in")
     u_type = request.POST.get("u_type","")
     pr_S = request.POST.get("pr_s","")
-    if priv =="yes":
-        user.privacy = True
-    else:
-        user.privacy = False
-    if u_type == "casual":
-        user.type = 1
-    elif u_type == "premium":
-        if pr_S == "s":
+    OTPVerifierObject = OTPVerifier()
+    OTPVerifierObject.setuser(request.user)
+    GenerationTime = time.time()
+    GeneratedToken = OTPVerifierObject.GenerateToken()
+    return render(request, 'settings.html', {'user': user, 'time': GenerationTime, 'sent1': True, 'chngto': u_type,'prsub':pr_S})
+
+
+def setutypeverify(request, Time, chngto):
+    user = User.object.get(username=request.user)
+    UserToken = int(request.POST.get("otp", ""))
+    # Time = time
+    OTPVerifierObject = OTPVerifier()
+    OTPVerifierObject.setuser(request.user)
+    t = False
+    while time.time() <= float(Time) + OTPVerifierObject.TokenValidityTime:
+        t = OTPVerifierObject.VerifyToken(UserToken, tolerance=1)
+    if t:
+        if chngto == "casual":
+            user.type = 1
+        elif chngto == "s":
             user.type = 2
             deduct(user,50)  #to be done monthly
-        elif pr_S =='g':
+        elif chngto =='g':
             user.type = 3
             deduct(user,100) #to be done monthly
-        elif pr_S =='p':
+        elif chngto =='p':
             user.type = 4
             deduct(user,150) #to be done monthly
+        elif chngto == "comm":
+            user.type = 5
+            deduct(user,5000) #to be done yearly
         else:
-            user.type = 2
-            deduct(user,50)  #to be done monthly
-    elif u_type == "comm":
-        user.type = 5
-        deduct(user,5000) #to be done yearly
+            user.type =1
+        url = request.build_absolute_uri('/').strip("/") + "/accounts/profile"
+        user.save()
+        return redirect(url)
     else:
-        user.type =1
-
-    url = request.build_absolute_uri('/').strip("/") + "/accounts/profile"
-    user.save()
-    return redirect(url)
+        raise Http404('Incorrect OTP entered')
 
 
 def grp_to_join(user1):
@@ -353,12 +407,15 @@ def group_box(request,groupname):
     print("innn here-----")
     user = User.object.get(username=request.user)
     group = Groups.objects.get(group_name=groupname)
+    flag= False
+    if user==group.group_admin:
+        flag = True
     mess = Group_messages.objects.filter(group=group)
     mess = mess.order_by('datetime')
     for element in mess:
         print(element.user.username, ":")
         print(element.message)
-    return render(request, 'groupbox.html', {'mess': mess, 'groupname': group.group_name})
+    return render(request, 'groupbox.html', {'mess': mess, 'groupname': group.group_name, 'flag':flag})
 
 
 def create_grp(request):
@@ -438,7 +495,7 @@ def Transactionsend(request):
     OTPVerifierObject.setuser(request.user)
     GenerationTime = time.time()
     GeneratedToken = OTPVerifierObject.GenerateToken()
-    return render(request, 'addmoney.html', {'user': user, 'time': GenerationTime, 'sent': True, 'amt':amt})
+    return render(request, 'addmoney.html', {'user': user, 'time': GenerationTime, 'sent': True, 'amt':amt, 'x':virkey()})
 
 def Transactionverify(request, Time, amt):
     user = User.object.get(username=request.user)
@@ -499,7 +556,7 @@ def Transactionsendto(request,username):
     OTPVerifierObject.setuser(request.user)
     GenerationTime = time.time()
     GeneratedToken = OTPVerifierObject.GenerateToken()
-    return render(request, 'sendmoneyform.html', {'user': user, 'time': GenerationTime, 'sent': True, 'amt':amt,'username':username})
+    return render(request, 'sendmoneyform.html', {'user': user, 'time': GenerationTime, 'sent': True, 'amt':amt,'username':username,'x':virkey()})
 
 
 def transverify(request,username, Time, amt):
@@ -530,6 +587,7 @@ def summary_acc(request):
     summary = summary.order_by('datetime')
     return render(request, 'account.html', {'summary':summary, 'user':user1})
 
+
 def pages(request):
     li = Pages.objects.all()
     user = User.object.get(username=request.user)
@@ -544,6 +602,7 @@ def create_page(request):
     Pages.objects.create(name=request.POST.get("pgnm", ""), admin=user)
     url = request.build_absolute_uri('/').strip("/") + "/accounts/profile/pages"
     return redirect(url)
+
 
 def viewpg(request,pgname):
     user = User.object.get(username=request.user)
@@ -578,3 +637,29 @@ def sendtogrp(request, Time, groupname):
         return redirect(url)
     else:
         raise Http404('Incorrect OTP entered')
+
+
+def virkey():
+    x=[[i] for i in range(10)]
+    shuffle(x)
+    return x
+
+
+def remuser(request, groupname):
+    grp = Groups.objects.get(group_name=groupname)
+    user = User.object.get(username=request.user)
+    mem = Group_mem.objects.filter(group=grp)
+    li = list()
+    for e in mem:
+        if not e.user == user:
+            li.append(e.user)
+    return render(request, 'removeuser.html', {'li': li, 'user': user, 'grp': grp})
+
+
+def remove_user(request, username, groupname):
+    print("ttttttttttttttttt")
+    grp = Groups.objects.get(group_name=groupname)
+    user = User.object.get(username=username)
+    Group_mem.objects.filter(group=grp,user =user).delete()
+    url = request.build_absolute_uri('/').strip("/") + "/accounts/profile/groups"
+    return redirect(url)

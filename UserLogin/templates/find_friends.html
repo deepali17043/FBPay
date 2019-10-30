@@ -1,5 +1,5 @@
 <h1>Find Friends</h1>
 {% for element in friends %}
-   <p><a href="/{{element}}/timeline"> {{element}} </a></p>
+   <p><a href="/{{element.username}}/timeline"> {{element.name}} </a></p>
 {% endfor %}
 <hr/>

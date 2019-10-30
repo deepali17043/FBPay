@@ -1,22 +1,123 @@
 <h1>Settings</h1>
-<form action="/set_settings/" method="POST">
+<form action="/setpriv_settings/" method="POST">
     {% csrf_token %}
     {{form.as_p}}
     Privacy : <br/>
     <input type="radio" name="priv" value="yes">friends can post<br/>
     <input type="radio" name="priv" value="no">friends can't post<br/>
-    <p>
+    <input type="submit" value="save">
+    <br/>
+</form>
+
+{% if sent2 %}
+<form action="/{{time}}/{{pri}}/privotp" method="POST">
+        {% csrf_token %}
+    {{form.as_p}}
+    Enter OTP recieved on registered email id :
+    <input type="number" name="otp" id="otp" value="Otp"><br/>
+
+<div class="grid-container">
+  {% for ele in x %}
+    <div class="grid-item"><input type="button" value="{{ele}}" id="{{ele}}"></div>
+  {% endfor %}
+</div>
+    <script>
+        document.getElementById('[0]').onclick = function() {
+            document.getElementById('otp').value += '0';
+        }
+        document.getElementById('[1]').onclick = function() {
+            document.getElementById('otp').value += '1';
+        }
+        document.getElementById('[2]').onclick = function() {
+            document.getElementById('otp').value += '2';
+        }
+        document.getElementById('[3]').onclick = function() {
+            document.getElementById('otp').value += '3';
+        }
+        document.getElementById('[4]').onclick = function() {
+            document.getElementById('otp').value += '4';
+        }
+        document.getElementById('[5]').onclick = function() {
+            document.getElementById('otp').value += '5';
+        }
+        document.getElementById('[6]').onclick = function() {
+            document.getElementById('otp').value += '6';
+        }
+        document.getElementById('[7]').onclick = function() {
+            document.getElementById('otp').value += '7';
+        }
+        document.getElementById('[8]').onclick = function() {
+            document.getElementById('otp').value += '8';
+        }
+        document.getElementById('[9]').onclick = function() {
+            document.getElementById('otp').value += '9';
+        }
+    </script>
+<input type="submit" value="OTP">
+</form>
+{% endif %}
+<hr/>
+<form action="/setutype_settings/" method="POST">
+    {% csrf_token %}
+    {{form.as_p}}
     Subscription : <br/>
     <input type="radio" name="u_type" value="casual">Casual <br/>
-    <input type="radio" name="u_type" value="premium">Premium <br/>
+     Premium <br/>
        <pre><p>
-         <input type="radio" name="pr_s" value="s">Silver (Rs. 50/month) <br/>
-         <input type="radio" name="pr_s" value="g">Gold (Rs. 100/month) <br/>
-         <input type="radio" name="pr_s" value="p">Platinum (Rs.150/month)<br/>
+         <input type="radio" name="u_type" value="s">Silver (Rs. 50/month) <br/>
+         <input type="radio" name="u_type" value="g">Gold (Rs. 100/month) <br/>
+         <input type="radio" name="u_type" value="p">Platinum (Rs.150/month)<br/>
         </p></pre>
     <input type="radio" name="u_type" value="comm">Commercial (Rs 5000/annum)<br/>
     </p>
     <input type="submit" value="save">
     <br/>
 </form>
+{% if sent1 %}
+<form action="/{{time}}/{{chngto}}/utypeotp" method="POST">
+        {% csrf_token %}
+    {{form.as_p}}
+    Enter OTP recieved on registered email id :
+    <input type="number" name="otp" id="otp" value="Otp"><br/>
+
+<div class="grid-container">
+  {% for ele in x %}
+    <div class="grid-item"><input type="button" value="{{ele}}" id="{{ele}}"></div>
+  {% endfor %}
+</div>
+    <script>
+        document.getElementById('[0]').onclick = function() {
+            document.getElementById('otp').value += '0';
+        }
+        document.getElementById('[1]').onclick = function() {
+            document.getElementById('otp').value += '1';
+        }
+        document.getElementById('[2]').onclick = function() {
+            document.getElementById('otp').value += '2';
+        }
+        document.getElementById('[3]').onclick = function() {
+            document.getElementById('otp').value += '3';
+        }
+        document.getElementById('[4]').onclick = function() {
+            document.getElementById('otp').value += '4';
+        }
+        document.getElementById('[5]').onclick = function() {
+            document.getElementById('otp').value += '5';
+        }
+        document.getElementById('[6]').onclick = function() {
+            document.getElementById('otp').value += '6';
+        }
+        document.getElementById('[7]').onclick = function() {
+            document.getElementById('otp').value += '7';
+        }
+        document.getElementById('[8]').onclick = function() {
+            document.getElementById('otp').value += '8';
+        }
+        document.getElementById('[9]').onclick = function() {
+            document.getElementById('otp').value += '9';
+        }
+    </script>
+<input type="submit" value="OTP">
+</form>
+{% endif %}
 <hr/>

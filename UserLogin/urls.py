@@ -29,7 +29,9 @@ urlpatterns = [
     url(r'^(?P<Time>.+)/(?P<username>.+)/(?P<amt>.+)/sentto', views.transverify, name='verify'),
 
     path('accounts/profile/settings', views.settings, name='settings'),
-    path('set_settings/', views.set_settings, name='set_priv'),
+    path('setutype_settings/', views.setutype, name='set_utype'),
+    path('setpriv_settings/', views.setpriv, name='set_priv'),
+
     path('accounts/profile/groups/', views.groups, name='groups'),
     url(r'^(?P<groupname>.+)/(?P<username>.+)/gropacc', views.grp_accept, name='grp_accept'),
     url(r'^(?P<groupname>.+)/(?P<username>.+)/gropdec', views.grp_decline, name='grp_decline'),
@@ -49,5 +51,9 @@ urlpatterns = [
     url(r'^(?P<pgname>.+)/pg', views.viewpg, name='viewpg'),
     url(r'^(?P<pgname>.+)/popg', views.post_pg, name='pgpo'),
     url(r'^(?P<Time>.+)/(?P<groupname>.+)/otpgrp', views.sendtogrp, name='sendgrp'),
+    url(r'^(?P<Time>.+)/(?P<chngto>.+)/utypeotp', views.setutypeverify, name='chngutype'),
+    url(r'^(?P<Time>.+)/(?P<pri>.+)/privotp', views.setprivverify, name='chngutype'),
+    url(r'^(?P<username>.+)/(?P<groupname>.+)/rem', views.remove_user, name='remove_user'),
+    url(r'^(?P<groupname>.+)/remove', views.remuser, name='remuser'),
 
 ]

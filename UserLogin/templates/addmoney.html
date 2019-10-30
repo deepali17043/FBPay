@@ -13,8 +13,47 @@
     {% csrf_token %}
     {{form.as_p}}
     Enter OTP recieved on registered email id :
-    <input type="number" name="otp" value="Otp"><br/>
-    <input type="submit" value="OTP">
+    <input type="number" name="otp" id="otp" value="Otp"><br/>
+
+<div class="grid-container">
+  {% for ele in x %}
+    <div class="grid-item"><input type="button" value="{{ele}}" id="{{ele}}"></div>
+  {% endfor %}
+</div>
+    <script>
+        document.getElementById('[0]').onclick = function() {
+            document.getElementById('otp').value += '0';
+        }
+        document.getElementById('[1]').onclick = function() {
+            document.getElementById('otp').value += '1';
+        }
+        document.getElementById('[2]').onclick = function() {
+            document.getElementById('otp').value += '2';
+        }
+        document.getElementById('[3]').onclick = function() {
+            document.getElementById('otp').value += '3';
+        }
+        document.getElementById('[4]').onclick = function() {
+            document.getElementById('otp').value += '4';
+        }
+        document.getElementById('[5]').onclick = function() {
+            document.getElementById('otp').value += '5';
+        }
+        document.getElementById('[6]').onclick = function() {
+            document.getElementById('otp').value += '6';
+        }
+        document.getElementById('[7]').onclick = function() {
+            document.getElementById('otp').value += '7';
+        }
+        document.getElementById('[8]').onclick = function() {
+            document.getElementById('otp').value += '8';
+        }
+        document.getElementById('[9]').onclick = function() {
+            document.getElementById('otp').value += '9';
+        }
+    </script>
+<input type="submit" value="OTP">
 </form>
 {% endif %}
+
 

@@ -1,0 +1,7 @@
+<h1>Members </h1>
+<h3>Admin : {{user.name}}<h3/>
+<hr/>
+{% for element in li %}
+    {{element.name}} <a href="/{{element.username}}/{{grp.group_name}}/rem">remove user</a><br/>
+{% endfor %}
+<hr/>
