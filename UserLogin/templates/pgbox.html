@@ -10,7 +10,7 @@
 <form action="/{{pg.name}}/popg" method="POST">
     {% csrf_token %}
     {{form.as_p}}
-    <input type="text" name="pst" value="input text"><br/>
+    <input type="text" name="pst" value=""><br/>
     <input type="submit" value="Post">
 </form>
 <br/>

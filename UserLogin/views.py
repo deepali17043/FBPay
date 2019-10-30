@@ -217,10 +217,13 @@ def add_message(request, username):
     # print('shree')
     user1 = User.object.get(username=request.user)
     user2 = User.object.get(username=username)
-    # print(request.method)
-    MessageBox.objects.create(from_m=user1, to_m=user2, message=request.POST.get("message", ""))
-    # print(request.POST.get("message", ""), ".................")
+    message = request.POST.get("message", "")
+    if not message == "":
+        # print(request.method)
+        MessageBox.objects.create(from_m=user1, to_m=user2, message=request.POST.get("message", ""))
+        # print(request.POST.get("message", ""), ".................")
     return messagebox(request, username)
+
 
 
 def messenger(request):
@@ -446,7 +449,9 @@ def create_grp(request):
 def grp_send(request,groupname):
     user = User.object.get(username=request.user)
     grp = Groups.objects.get(group_name=groupname)
-    Group_messages.objects.create(user=user, group=grp, message=request.POST.get("message", ""))
+    message = request.POST.get("message", "")
+    if not message == "":
+        Group_messages.objects.create(user=user, group=grp, message=message)
     return group_box(request, groupname)
 
 
@@ -624,7 +629,9 @@ def viewpg(request,pgname):
 def post_pg(request,pgname):
     user = User.object.get(username=request.user)
     pg = Pages.objects.get(name=pgname)
-    PageContent.objects.create(page=pg, post=request.POST.get("pst", ""))
+    post = request.POST.get("pst", "")
+    if not post == "":
+        PageContent.objects.create(page=pg, post=post)
     return viewpg(request, pgname)
 
 

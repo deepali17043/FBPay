@@ -1,9 +1,6 @@
-<head><meta http-equiv="refresh" content="30"/></head>
-<script>
-if ( window.history.replaceState ) {
-  window.history.replaceState( null, null, window.location.href );
-}
-</script>
+<head><meta http-equiv="refresh" content="15"/></head>
+
+
 <h1>Messages</h1>
 {% for element in mess %}
     <p>{{element.from_m}}:<br/>
@@ -14,7 +11,7 @@ if ( window.history.replaceState ) {
 <form action="/{{username}}/text/" method="POST">
     {% csrf_token %}
     {{form.as_p}}
-    <input type="text" name="message" value="input text"><br/>
+    <input type="text" name="message" value=""><br/>
     <input type="submit" value="send message">
 </form>
 <br/>
