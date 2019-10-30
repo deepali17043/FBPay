@@ -149,8 +149,8 @@ class AccountSummary(models.Model):
 
 
 class Pages(models.Model):
-    id = models.IntegerField(auto_created=True,primary_key=True)
-    name = models.CharField(max_length=1000,unique=True)
+    id = models.IntegerField(auto_created=True, primary_key=True)
+    name = models.CharField(max_length=1000, unique=True)
     admin = models.ForeignKey(User, on_delete=models.CASCADE, related_name="adm")
     date = models.DateField(auto_now=True)
 

@@ -405,6 +405,7 @@ def user_to_grp(request,groupname):
     print(url)
     return redirect(url)
 
+
 def group_box(request,groupname):
     print("innn here-----")
     user = User.object.get(username=request.user)
@@ -664,4 +665,9 @@ def remove_user(request, username, groupname):
     user = User.object.get(username=username)
     Group_mem.objects.filter(group=grp,user =user).delete()
     url = request.build_absolute_uri('/').strip("/") + "/accounts/profile/groups"
+    return redirect(url)
+
+
+def HomePage(request):
+    url = request.build_absolute_uri('/').strip("/") + "/login"
     return redirect(url)
