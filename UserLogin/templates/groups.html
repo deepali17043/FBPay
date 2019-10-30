@@ -1,4 +1,9 @@
 <head><meta http-equiv="refresh" content="30"/></head>
+<script>
+if ( window.history.replaceState ) {
+  window.history.replaceState( null, null, window.location.href );
+}
+</script>
 <h1>Groups</h1>
 {% for element in grp %}
     <a href="/{{element.group.group_name}}/grp">{{element.group.group_name}} </a><br/>

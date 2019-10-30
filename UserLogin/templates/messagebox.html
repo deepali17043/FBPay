@@ -1,4 +1,9 @@
 <head><meta http-equiv="refresh" content="30"/></head>
+<script>
+if ( window.history.replaceState ) {
+  window.history.replaceState( null, null, window.location.href );
+}
+</script>
 <h1>Messages</h1>
 {% for element in mess %}
     <p>{{element.from_m}}:<br/>
