@@ -1,7 +1,13 @@
 <table style="width:100%;">
     <td style="text-align:center;">
         <p>
-        <h1>{{ user.username }} </h1></p>
+        <h3>{{ user.name }}</h3>
+        <hr/>
+        <h4>Profile info:</h4>
+        <h5>{{user.username}}<h5/>
+        <h5> Born on {{user.Birthday}} <h5/>
+            <h5>{{user.email}}<h5/>
+
             {% for name in reqs %}
                 {% if name == user.username %}
                     <p><a href="/{{user.username}}/send_req">send request</a></p>

@@ -1,10 +1,12 @@
 {{ user.authenticateuser }}
 <table style="width:100%;">
     <td style="text-align:center;">
-        <h3><a href="timeline.html">{{ user.username }}</a></h3>
+        <h3>{{ user.name }}</h3>
         <hr/>
-        <p><a href="about.html">About</a></p>
-        <hr/>
+        <h4>Profile info:</h4>
+        <h5>{{user.username}}<h5/>
+        <h5> Born on {{user.Birthday}} <h5/>
+            <h5>{{user.email}}<h5/>
         <p><a href="FriendList.html">Friends</a></p>
         <hr/>
         <p><a href="groups">Groups</a></p>

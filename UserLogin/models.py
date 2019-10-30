@@ -35,7 +35,7 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser):
     username = models.CharField(max_length=255, unique=True)
     # password = models.CharField(max_length=255)
-    email = models.EmailField(max_length=254, default=username)
+    email = models.EmailField(max_length=254)
     name = models.CharField(max_length=255)
     Birthday = models.CharField(max_length=10)
     # WalletMoney = models.IntegerField(default=)
@@ -60,11 +60,9 @@ class User(AbstractBaseUser):
         print(self.username)
         # user = User.object.get(username=self.username).update(authenticated=True)
         user = User.object.get(username=self.username)
-        user.Birthday = "199999999"
         user.authenticated = 0
         user.save()
         user1 = User.object.get(username=self.username)
-        print(user1.Birthday, "hellllllll", user1.authenticated)
         return ''
 
     def unauthenticateuser(self):

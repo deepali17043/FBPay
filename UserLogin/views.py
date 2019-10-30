@@ -123,7 +123,9 @@ def other_profile(request, username):
         if elm.username not in friends:
             reqs.append(elm.username)
     time = user.timeline
-    post = user.privacy
+    post = False
+    if user.username in friends:
+        post = user.privacy
     data = Timeline.objects.filter(to_t=user)
     is_frd = Friendship.objects.filter(user1=user1,user2=user) | Friendship.objects.filter(user1=user,user2=user1)
     for elm in reqs:
