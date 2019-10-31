@@ -51,7 +51,12 @@ def ProfileView(request):
 class SignUpView(generic.CreateView):
     form_class = CustomUserCreationForm
     success_url = reverse_lazy('login')
-    template_name = 'signup.html'
+
+    def __init__(self):
+        if User.object.all().count() < 20:
+            self.template_name = 'signup.html'
+        else:
+            raise Http404('Cannot accept more users. Limit exceeded.')
 
 
 def logoutuser(request, username):
@@ -440,7 +445,10 @@ def create_grp(request):
     elif user.type==3 and Groups.objects.filter(group_admin=user, group_closed=True).count()>3:
         raise Http404("sorry cannot create more groups")
 
-    Groups.objects.create(group_name=request.POST.get("grp_name", ""),group_admin=user, group_closed=grp, group_price=request.POST.get("price", ""))
+    p = request.POST.get("price", "")
+    if user.type == 1:
+        p = 0
+    Groups.objects.create(group_name=request.POST.get("grp_name", ""), group_admin=user, group_closed=grp, group_price=p)
     Group_mem.objects.create(user=user,group=Groups.objects.get(group_name=request.POST.get("grp_name", "")))
     url = request.build_absolute_uri('/').strip("/") + "/accounts/profile/groups"
     return redirect(url)
@@ -602,7 +610,7 @@ def summary_acc(request):
 def pages(request):
     li = Pages.objects.all()
     user = User.object.get(username=request.user)
-    flag =  False
+    flag = False
     if user.type==5:
         flag=True
     return render(request, 'pages.html', {'pg':li,'user':user, 'bol':flag})
