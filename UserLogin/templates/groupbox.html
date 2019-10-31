@@ -20,7 +20,9 @@ if ( window.history.replaceState ) {
 </form>
 <br/>
 <hr/>
-<a href="/{{groupname}}/remove">remove users</a>
+{% if flag %}
+    <a href="/{{groupname}}/remove">remove users</a>
+{% endif %}
 <br/>
 <hr/>
 <br/>
