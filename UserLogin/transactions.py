@@ -28,7 +28,7 @@ class OTPVerifier():
                         digits=self.digits)
         totp_obj.time = time.time()
         token = str(totp_obj.token())
-        print(token)
+        # print(token)
         mail = 'Hello, ' + self.user.name + '. Your OTP is: ' + token
         send_mail('OTP', mail, 'otpverifier80@gmail.com', [self.user.email], fail_silently=False)
         return token

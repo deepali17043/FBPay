@@ -28,7 +28,7 @@ def url_correction(request):
         url = request.build_absolute_uri('/').strip("/") + "/accounts/profile"
     else:
         url = request.build_absolute_uri('?')
-    print(url)
+    # print(url)
     return redirect(url)
 
 
@@ -69,7 +69,7 @@ def walletview(request):
     # print(username)
     user = User.object.get(username=request.user)
     if user.isauthenticated() == 1:
-        print(user.username)
+        # print(user.username)
         raise Http404("user not logged in")
     return render(request, 'ewallet.html', {'balance': user.balance})
 
@@ -79,8 +79,8 @@ def groups(request):
     if user.isauthenticated() == 1:
         raise Http404("user not logged in")
     grp = Group_mem.objects.filter(user=user)
-    for el in grp:
-        print(el.group.group_name)
+    # for el in grp:
+        # print(el.group.group_name)
     flag = True
     if user.type==1:
         flag = False
@@ -133,8 +133,8 @@ def other_profile(request, username):
         post = user.privacy
     data = Timeline.objects.filter(to_t=user)
     is_frd = Friendship.objects.filter(user1=user1,user2=user) | Friendship.objects.filter(user1=user,user2=user1)
-    for elm in reqs:
-        print(elm,"----*******----------")
+    # for elm in reqs:
+        # print(elm,"----*******----------")
     return render(request, 'profile.html', {'user': user, 'reqs':reqs, 'pub': time,'post':post, 'data': data, 'is_friend':is_frd})
 
 
@@ -161,9 +161,9 @@ def addfriend(request, username):
     user2 = User.object.get(username=username)
     user1 = request.user
     FriendshipRequest.objects.create(from_user=request.user, to_user=user2)
-    print("request_sent")
+    # print("request_sent")
     url = request.build_absolute_uri('/').strip("/") + "/accounts/profile/find"
-    print(url)
+    # print(url)
     return redirect(url)
 
 
@@ -206,7 +206,7 @@ def decline(request, username):
     user2 = User.object.get(username=username)
     exist = FriendshipRequest.objects.filter(from_user=user2, to_user=user1, accepted=False)
     if exist:
-        print(user2.username, "JA RAHA HAIIII")
+        # print(user2.username, "JA RAHA HAIIII")
         all = FriendshipRequest.objects.all()
         for x in all:
             if (x.from_user == user2 and x.to_user == user1):
@@ -214,7 +214,7 @@ def decline(request, username):
     else:
         raise Http404("sorry, this user did not send you a friend request")
     url = request.build_absolute_uri('/').strip("/") + "/accounts/profile"
-    print(url)
+    # print(url)
     return redirect(url)
 
 
@@ -262,9 +262,9 @@ def messagebox(request, username):
     user2 = User.object.get(username=username)
     mess = MessageBox.objects.filter(from_m=user1, to_m=user2) | MessageBox.objects.filter(from_m=user2, to_m=user1)
     mess = mess.order_by('datetime')
-    for element in mess:
-        print(element.from_m, ":")
-        print(element.message)
+    # for element in mess:
+    #     print(element.from_m, ":")
+    #     print(element.message)
     return render(request, 'messagebox.html', {'mess': mess, 'username': username})
 
 
@@ -290,6 +290,8 @@ def deduct(user,val):
     if user.balance - val < 0:
         raise Http404('Insufficient Balance')
     user.balance = user.balance - val
+    AccountSummary.objects.create(from_t=user, to_t=user, amtsent=-val, balance1=user.balance,balance2=user.balance, selfp=True)
+
 
 
 def setpriv(request):
@@ -397,7 +399,7 @@ def user_to_grp(request,groupname):
     grp = Groups.objects.get(group_name=groupname)
     user = User.object.get(username=request.user)
     if user.isauthenticated() == 1:
-        print(user.username)
+        # print(user.username)
         raise Http404("user not logged in")
     grps = grp_to_join(request.user)
     if not grp.group_closed:
@@ -411,14 +413,14 @@ def user_to_grp(request,groupname):
             return render(request, 'join_groups.html', {'user': user,'grps':grps,'time': GenerationTime, 'sent': True,'gp':grp })
         else:
             GroupRequest.objects.create(group=grp, fro=user)
-        print("group_request_sent")
+        # print("group_request_sent")
     url = request.build_absolute_uri('/').strip("/") + "/grp_find"
-    print(url)
+    # print(url)
     return redirect(url)
 
 
 def group_box(request,groupname):
-    print("innn here-----")
+    # print("innn here-----")
     user = User.object.get(username=request.user)
     group = Groups.objects.get(group_name=groupname)
     flag= False
@@ -426,9 +428,9 @@ def group_box(request,groupname):
         flag = True
     mess = Group_messages.objects.filter(group=group)
     mess = mess.order_by('datetime')
-    for element in mess:
-        print(element.user.username, ":")
-        print(element.message)
+    # for element in mess:
+    #     print(element.user.username, ":")
+    #     print(element.message)
     return render(request, 'groupbox.html', {'mess': mess, 'groupname': group.group_name, 'flag':flag})
 
 
@@ -438,8 +440,8 @@ def create_grp(request):
     grp = False
     if c == "yes":
         grp = True
-    print(Groups.objects.filter(group_admin=user, group_closed=True).count(),"hhhh")
-    print(user.type,"usertype")
+    # print(Groups.objects.filter(group_admin=user, group_closed=True).count(),"hhhh")
+    # print(user.type,"usertype")
     if user.type==2 and Groups.objects.filter(group_admin=user, group_closed=True).count()>1:
         raise Http404("sorry cannot create more groups")
     elif user.type==3 and Groups.objects.filter(group_admin=user, group_closed=True).count()>3:
@@ -471,11 +473,12 @@ def grp_accept(request,groupname,username):
         Group_mem.objects.create(user=user,group=group)
         user.balance = user.balance - group.group_price
         user.save()
+        AccountSummary.objects.create(from_t=user, to_t=user, amtsent=-group.group_price, balance1=user.balance,balance2=user.balance, selfp=True)
         GroupRequest.objects.filter(group=group,fro=user).delete()
     else:
         raise Http404("sorry, this user did not send you a group request")
     url = request.build_absolute_uri('/').strip("/") + "/accounts/profile"
-    print(url)
+    # print(url)
     return redirect(url)
 
 
@@ -489,21 +492,21 @@ def grp_decline(request,groupname,username):
     else:
         raise Http404("sorry, this user did not send you a group request")
     url = request.build_absolute_uri('/').strip("/") + "/accounts/profile"
-    print(url)
+    # print(url)
     return redirect(url)
 
 
 def Transactionsend(request):
     user = User.object.get(username=request.user)
     if user.isauthenticated() == 1:
-        print(user.username)
+        # print(user.username)
         raise Http404("user not logged in")
 
     tod = date.today()
-    print(tod)
+    # print(tod)
     summary = AccountSummary.objects.filter(from_t=user,datetime__month=tod.month) | AccountSummary.objects.filter(to_t=user, datetime__month=tod.month)
     no_trans = summary.count()
-    print(no_trans, "************")
+    # print(no_trans, "************")
     if user.type == 1 and no_trans > 15:
         raise Http404("Exceeded limit of transaction")
     elif (user.type == 2 or user.type == 3 or user.type == 4) and no_trans > 30:
@@ -556,16 +559,16 @@ def send_money_to(request, username):
 def Transactionsendto(request,username):
     user = User.object.get(username=request.user)
     if user.isauthenticated() == 1:
-        print(user.username)
+        # print(user.username)
         raise Http404("user not logged in")
     amt = request.POST.get("amt","")
     if (user.balance - int(amt) < 0):
         raise Http404("Insufficient balance")
     tod = date.today()
-    print(tod)
+    # print(tod)
     summary = AccountSummary.objects.filter(from_t=user,datetime__month=tod.month) | AccountSummary.objects.filter(to_t=user,datetime__month=tod.month)
     no_trans = summary.count()
-    print(no_trans,"************")
+    # print(no_trans,"************")
     if user.type == 1 and no_trans > 15:
         raise Http404("Exceeded limit of transaction")
     elif (user.type == 2 or user.type == 3 or user.type == 4) and no_trans > 30:
@@ -678,9 +681,11 @@ def remuser(request, groupname):
 
 
 def remove_user(request, username, groupname):
-    print("ttttttttttttttttt")
+    # print("ttttttttttttttttt")
     grp = Groups.objects.get(group_name=groupname)
     user = User.object.get(username=username)
+    if not request.user == grp.group_admin:
+        raise Http404('You do not have the authority to remove users')
     Group_mem.objects.filter(group=grp,user =user).delete()
     url = request.build_absolute_uri('/').strip("/") + "/accounts/profile/groups"
     return redirect(url)
