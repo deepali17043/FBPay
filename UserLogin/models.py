@@ -44,6 +44,7 @@ class User(AbstractBaseUser):
     privacy = models.BooleanField(default=True)
     timeline = models.BooleanField(default=True)
     type = models.IntegerField(default=1)
+    grpadm = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     # this field is required to login super user from admin panel
     is_staff = models.BooleanField(default=True)

@@ -45,7 +45,8 @@ def ProfileView(request):
     reqs = get_pending_requests(user)
     posts = Timeline.objects.filter(from_t=request.user) | Timeline.objects.filter(to_t=request.user)
     greqs = grp_requests(user)
-    return render(request, 'newsfeed.html', {'user': user, 'freqs': reqs, 'posts': posts,'greqs':greqs})
+    grpadm = user.grpadm
+    return render(request, 'newsfeed.html', {'user': user, 'freqs': reqs, 'posts': posts,'greqs':greqs,'grpadm':grpadm})
 
 
 class SignUpView(generic.CreateView):
@@ -705,4 +706,18 @@ def unfriend(request, username):
     if y:
         y.delete()
     url = request.build_absolute_uri('/').strip("/") + "/accounts/profile/FriendList.html"
+    return redirect(url)
+
+def user_del(request):
+    user = User.object.get(username=request.user)
+    all = User.object.exclude(username=request.user)
+    return render(request, 'userdel.html', {'user':user,'all':all})
+
+def fakeuserdel(request, username):
+    user1 = User.object.get(username=request.user)
+    user2 = User.object.get(username=username)
+    if not user1.grpadm:
+        raise Http404('You do not have the authority to remove users')
+    User.objects.filter(username =user2.username).delete()
+    url = request.build_absolute_uri('/').strip("/") + "/accounts/profile/groups"
     return redirect(url)
