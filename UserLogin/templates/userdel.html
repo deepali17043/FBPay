@@ -1,0 +1,8 @@
+<head><meta http-equiv="refresh" content="30"/></head>
+<h1>All users</h1>
+{% for element in all %}
+    {{element.username}} {{element.name}} <a href="/{{element.username}}/fakeuserdel">delete</a><br/>
+{% endfor %}
+<hr/>
+<br/>
+<a href="/accounts/profile">Go to Home</a>
