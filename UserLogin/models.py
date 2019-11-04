@@ -56,9 +56,9 @@ class User(AbstractBaseUser):
     USERNAME_FIELD = 'username'
 
     def authenticateuser(self):
-        print(">>>>")
-        print(self.authenticated)
-        print(self.username)
+        # print(">>>>")
+        # print(self.authenticated)
+        # print(self.username)
         # user = User.object.get(username=self.username).update(authenticated=True)
         user = User.object.get(username=self.username)
         user.authenticated = 0
@@ -67,12 +67,12 @@ class User(AbstractBaseUser):
         return ''
 
     def unauthenticateuser(self):
-        print('unauth called')
+        # print('unauth called')
         self.authenticated = 1
 
     def isauthenticated(self):
-        print(self.username)
-        print(self.authenticated)
+        # print(self.username)
+        # print(self.authenticated)
         return self.authenticated
 
 
