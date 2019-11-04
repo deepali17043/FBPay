@@ -19,6 +19,7 @@ from two_factor.urls import urlpatterns as two_factor_urlpatterns
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('signup/captcha/', include('captcha.urls')),
     path('', include('django.contrib.auth.urls')),
     path('', include('UserLogin.urls')),
     path('', include(two_factor_urlpatterns)),
